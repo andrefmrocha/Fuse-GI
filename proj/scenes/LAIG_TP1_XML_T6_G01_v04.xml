@@ -1,0 +1,409 @@
+<lxs>
+    <scene root="scene" axis_length="5"/>
+
+    <views default="defCam">
+        <perspective id="defCam" near="5" far="500" angle="60">
+            <from x="10" y="10" z="10" />
+            <to x="0" y="0" z="0" />
+        </perspective>
+    </views>
+
+    <globals>
+        <ambient r="0.2" g="0.2" b="0.2" a="1.0" />
+        <background r="0.0" g="0.0" b="0.0" a="1.0" />
+    </globals>
+
+    <lights>
+        <omni id="mainLight" enabled="1">
+            <location x="0" y="20" z="0" w="1.0" />
+            <ambient r="0" g="0" b="0" a="1.0" />
+            <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
+            <specular r="1.0" g="1.0" b="1.0" a="1.0" />
+            <attenuation constant="1" linear="0" quadratic="0" />  
+        </omni>
+    </lights>
+
+    <textures>
+        <texture id="boardWood" file="scenes/images/board_wood.jpg" />
+        <texture id="outerBoardWood" file="scenes/images/outer_board_wood.jpg" />
+        <texture id="boardCell" file="scenes/images/board_cell.jpg" />
+        <texture id="outerBoardCell" file="scenes/images/outer_board_cell.jpg" />
+    </textures>
+
+    <materials>
+        <material id="whiteMaterial" shininess="1">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
+            <diffuse r="0.6" g="0.6" b="0.6" a="1.0" />
+            <specular r="1" g="1" b="1" a="1.0" />
+        </material>
+    </materials>
+
+    <transformations>
+        <transformation id="test">
+            <translate x="80" y="0" z="0" />
+            <rotate axis="y" angle="-90" />
+        </transformation>
+    </transformations>
+
+    <animations>
+    </animations>
+
+    <primitives>
+        <primitive id="triangle">
+            <triangle x1="0" y1="0" z1="1" x2="1" y2="0" z2="0" x3="0" y3="1" z3="0" />
+        </primitive>
+        <primitive id="rectangle">
+            <rectangle x1="-1" y1="-1" x2="1" y2="1" />
+        </primitive>
+        <primitive id="square">
+            <rectangle x1="-0.5" y1="-0.5" x2="0.5" y2="0.5" />
+        </primitive>
+        <primitive id="sphere">
+            <sphere radius="1" slices="28" stacks="10"/>
+        </primitive>
+        <primitive id="torus">
+            <torus inner="0.1" outer="0.9" slices="20" loops="40"/>
+        </primitive>
+        <primitive id="cylinder">
+            <cylinder base="1" top="1" height="1" slices="30" stacks="10"/>
+        </primitive>
+        <primitive id="cone">
+            <cylinder base="1" top="0" height="1" slices="30" stacks="5"/>
+        </primitive>
+    </primitives>
+
+    <components>
+                              
+        <component id="scene">
+            <transformation>
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardTest" />
+            </children>
+        </component>
+
+        <component id="boardTest">
+            <transformation>
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellIn1" />
+                <componentref id="boardCellIn2" />
+                <componentref id="boardCellIn3" />
+                <componentref id="boardCellIn4" />
+
+                <componentref id="boardCellOut1" />
+                <componentref id="boardCellOut2" />
+                <componentref id="boardCellOut3" />
+                <componentref id="boardCellOut4" />
+                <componentref id="boardCellOut5" />
+                <componentref id="boardCellOut6" />
+                <componentref id="boardCellOut7" />
+                <componentref id="boardCellOut8" />
+            </children>
+        </component>
+
+        <component id="boardCellIn1">
+            <transformation>
+                <translate x="-0.5" y="0" z="-0.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellIn" />
+            </children>
+        </component>
+        <component id="boardCellIn2">
+            <transformation>
+                <translate x="-0.5" y="0" z="0.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellIn" />
+            </children>
+        </component>
+        <component id="boardCellIn3">
+            <transformation>
+                <translate x="0.5" y="0" z="-0.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellIn" />
+            </children>
+        </component>
+        <component id="boardCellIn4">
+            <transformation>
+                <translate x="0.5" y="0" z="0.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellIn" />
+            </children>
+        </component>
+        <component id="boardCellOut1">
+            <transformation>
+                <translate x="1.5" y="0" z="0.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellOut" />
+            </children>
+        </component>
+        <component id="boardCellOut2">
+            <transformation>
+                <translate x="1.5" y="0" z="-0.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellOut" />
+            </children>
+        </component>
+        <component id="boardCellOut3">
+            <transformation>
+                <translate x="0.5" y="0" z="-1.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellOut" />
+            </children>
+        </component>
+        <component id="boardCellOut4">
+            <transformation>
+                <translate x="-0.5" y="0" z="-1.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellOut" />
+            </children>
+        </component>
+        <component id="boardCellOut5">
+            <transformation>
+                <translate x="-1.5" y="0" z="-0.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellOut" />
+            </children>
+        </component>
+        <component id="boardCellOut6">
+            <transformation>
+                <translate x="-1.5" y="0" z="0.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellOut" />
+            </children>
+        </component>
+        <component id="boardCellOut7">
+            <transformation>
+                <translate x="-0.5" y="0" z="1.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellOut" />
+            </children>
+        </component>
+        <component id="boardCellOut8">
+            <transformation>
+                <translate x="0.5" y="0" z="1.5" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="boardCellOut" />
+            </children>
+        </component>
+
+        
+
+        <component id="boardCellIn">
+            <transformation>
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="boardWood" length_s="1" length_t="1" />
+            <children>
+                <componentref id="unitCube" />
+                <componentref id="cellTop" />
+            </children>
+        </component>
+
+        <component id="boardCellOut">
+            <transformation>
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="boardWood" length_s="1" length_t="1" />
+            <children>
+                <componentref id="unitCube" />
+                <componentref id="outerCellTop" />
+            </children>
+        </component>
+        
+        <component id="cellTop">
+            <transformation>
+                <translate x="0" y="0.5001" z="0" />
+                <rotate angle="-90" axis="x" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="boardCell" length_s="1" length_t="1" />
+            <children>
+                <primitiveref id="square" />
+            </children>
+        </component>
+        
+        <component id="outerCellTop">
+            <transformation>
+                <translate x="0" y="0.5001" z="0" />
+                <rotate angle="-90" axis="x" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="outerBoardCell" length_s="1" length_t="1" />
+            <children>
+                <primitiveref id="square" />
+            </children>
+        </component>
+
+        <component id="unitCube">
+            <transformation>
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <componentref id="unitCubeTop" />
+                <componentref id="unitCubeBottom" />
+                <componentref id="unitCubeFront" />
+                <componentref id="unitCubeBack" />
+                <componentref id="unitCubeRight" />
+                <componentref id="unitCubeLeft" />
+            </children>
+        </component>
+        <component id="unitCubeTop">
+            <transformation>
+                <translate x="0" y="0.5" z="0" />
+                <rotate axis="x" angle="-90" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <primitiveref id="square" />
+            </children>
+        </component>
+        <component id="unitCubeBottom">
+            <transformation>
+                <translate x="0" y="-0.5" z="0" />
+                <rotate axis="x" angle="90" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <primitiveref id="square" />
+            </children>
+        </component>
+        <component id="unitCubeFront">
+            <transformation>
+                <translate x="0" y="0" z="0.5" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <primitiveref id="square" />
+            </children>
+        </component>
+        <component id="unitCubeBack">
+            <transformation>
+                <translate x="0" y="0" z="-0.5" />
+                <rotate axis="y" angle="180" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <primitiveref id="square" />
+            </children>
+        </component>
+        <component id="unitCubeRight">
+            <transformation>
+                <translate x="-0.5" y="0" z="0" />
+                <rotate axis="y" angle="-90" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <primitiveref id="square" />
+            </children>
+        </component>
+        <component id="unitCubeLeft">
+            <transformation>
+                <translate x="0.5" y="0" z="0" />
+                <rotate axis="y" angle="90" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <primitiveref id="square" />
+            </children>
+        </component>
+    </components>
+</lxs>
