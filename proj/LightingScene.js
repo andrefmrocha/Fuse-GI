@@ -83,7 +83,7 @@ class LightingScene extends CGFscene{
 		this.appearance.apply();
 		this.rotate(Math.PI / 2.0, 1, 0, 0);
 		// draw objects
-		for (var i = 0; i < this.objects.length; i++) {
+		for (let i = 0; i < this.objects.length; i++) {
 			this.pushMatrix();
 			this.translate(i * 2, 0, 0);
 
