@@ -16,7 +16,14 @@
 
     <lights>
         <omni id="mainLight" enabled="1">
-            <location x="0" y="20" z="0" w="1.0" />
+            <location x="-10" y="20" z="-10" w="1.0" />
+            <ambient r="0" g="0" b="0" a="1.0" />
+            <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
+            <specular r="1.0" g="1.0" b="1.0" a="1.0" />
+            <attenuation constant="1" linear="0" quadratic="0" />  
+        </omni>
+        <omni id="secondLight" enabled="1">
+            <location x="10" y="20" z="10" w="1.0" />
             <ambient r="0" g="0" b="0" a="1.0" />
             <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
             <specular r="1.0" g="1.0" b="1.0" a="1.0" />
@@ -29,6 +36,9 @@
         <texture id="outerBoardWood" file="scenes/images/outer_board_wood.jpg" />
         <texture id="boardCell" file="scenes/images/board_cell.jpg" />
         <texture id="outerBoardCell" file="scenes/images/outer_board_cell.jpg" />
+        <texture id="blueDisc" file="scenes/images/blue_disc.jpg" />
+        <texture id="whiteDisc" file="scenes/images/white_disc.jpg" />
+        <texture id="blackDisc" file="scenes/images/black_disc.jpg" />
     </textures>
 
     <materials>
@@ -70,7 +80,7 @@
             <cylinder base="1" top="1" height="1" slices="30" stacks="10"/>
         </primitive>
         <primitive id="based_cylinder">
-            <basedcylinder base="0.5" top="0.5" height="0.5" slices="10" stacks="10"/>
+            <basedcylinder base="0.5" top="0.5" height="0.5" slices="20" stacks="1"/>
         </primitive>
         <primitive id="cone">
             <cylinder base="1" top="0" height="1" slices="30" stacks="5"/>
@@ -89,6 +99,7 @@
             <children>
                 <componentref id="boardTest" />
                 <componentref id="player1Disc" />
+                <componentref id="player2Disc" />
             </children>
         </component>
 
@@ -101,7 +112,22 @@
             <materials>
                 <material id="whiteMaterial" />
             </materials>
-            <texture id="none" />
+            <texture id="whiteDisc" length_s="1" length_t="1" />
+            <children>
+                <primitiveref id="based_cylinder" />
+            </children>
+        </component>
+
+        <component id="player2Disc">
+            <transformation>
+                <translate x="-0.5" y="0" z="-0.5" />
+                <scale x="0.8" y="0.4" z="0.8" />
+                <rotate axis="x" angle="-90" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="blackDisc" length_s="1" length_t="1" />
             <children>
                 <primitiveref id="based_cylinder" />
             </children>
