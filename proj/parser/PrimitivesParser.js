@@ -58,13 +58,14 @@ const primitiveParsers = {
         (primitiveType != 'rectangle' &&
           primitiveType != 'triangle' &&
           primitiveType != 'cylinder' &&
+          primitiveType != 'basedcylinder' &&
           primitiveType != 'sphere' &&
           primitiveType != 'torus' &&
           primitiveType != 'plane' &&
           primitiveType != 'patch' &&
           primitiveType != 'cylinder2')
       ) {
-        return 'There must be exactly 1 primitive type (rectangle, triangle, cylinder, sphere, torus, plane, patch, cylinder2)';
+        return 'There must be exactly 1 primitive type (rectangle, triangle, cylinder, basedcylinder, sphere, torus, plane, patch, cylinder2)';
       }
 
       // Specifications for the current primitive.
@@ -78,6 +79,10 @@ const primitiveParsers = {
 
         case 'cylinder':
           primitive = primitiveParsers.parseCylinder(grandChildren[0], sceneGraph.scene, primitiveId, sceneGraph);
+          break;
+
+        case 'basedcylinder':
+          primitive = primitiveParsers.parseBasedCylinder(grandChildren[0], sceneGraph.scene, primitiveId, sceneGraph);
           break;
 
         case 'sphere':
@@ -198,6 +203,50 @@ const primitiveParsers = {
       sceneGraph
     );
     return new MyCylinder(scene, height, base, top, cylinderSlices, cylinderStacks);
+  },
+
+  /**
+   * @param  {XMLCollection Object} component
+   * @param  {MyScene} scene
+   * @param  {string} primitiveId
+   * @param  {MySceneGraph} sceneGraph
+   */
+  parseBasedCylinder: (component, scene, primitiveId, sceneGraph) => {
+    const base = getPrimitiveFloatInfo(
+      component,
+      'base',
+      'unable to parse base of the primitive coordinates for ID = ' + primitiveId,
+      sceneGraph
+    );
+
+    const top = getPrimitiveFloatInfo(
+      component, 
+      'top',
+      'unable to parse top of the primitive coordinates for ID = ' + primitiveId,
+      sceneGraph
+    );
+
+    const height = getPrimitiveFloatInfo(
+      component,
+      'height',
+      'unable to parse height of the primitive coordinates for ID = ' + primitiveId,
+      sceneGraph
+    );
+
+    const cylinderSlices = getPrimitiveIntInfo(
+      component,
+      'slices',
+      'unable to parse slices of the primitive coordinates for ID = ' + primitiveId,
+      sceneGraph
+    );
+
+    const cylinderStacks = getPrimitiveIntInfo(
+      component,
+      'stacks',
+      'unable to parse stacks of the primitive coordinates for ID = ' + primitiveId,
+      sceneGraph
+    );
+    return new MyBasedCylinder(scene, height, base, top, cylinderSlices, cylinderStacks);
   },
 
   /**

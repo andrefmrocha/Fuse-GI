@@ -1,3 +1,4 @@
+
 <lxs>
     <scene root="scene" axis_length="5"/>
 
@@ -68,6 +69,9 @@
         <primitive id="cylinder">
             <cylinder base="1" top="1" height="1" slices="30" stacks="10"/>
         </primitive>
+        <primitive id="based_cylinder">
+            <basedcylinder base="0.5" top="0.5" height="0.5" slices="10" stacks="10"/>
+        </primitive>
         <primitive id="cone">
             <cylinder base="1" top="0" height="1" slices="30" stacks="5"/>
         </primitive>
@@ -84,11 +88,28 @@
             <texture id="none" />
             <children>
                 <componentref id="boardTest" />
+                <componentref id="player1Disc" />
+            </children>
+        </component>
+
+        <component id="player1Disc">
+            <transformation>
+                <translate x="0.5" y="0" z="0.5" />
+                <scale x="0.8" y="0.4" z="0.8" />
+                <rotate axis="x" angle="-90" />
+            </transformation>
+            <materials>
+                <material id="whiteMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <primitiveref id="based_cylinder" />
             </children>
         </component>
 
         <component id="boardTest">
             <transformation>
+                <translate x="0" y="-0.5" z="0" />
             </transformation>
             <materials>
                 <material id="whiteMaterial" />
