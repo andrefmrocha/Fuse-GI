@@ -41,6 +41,72 @@ class XMLscene extends CGFscene {
 
     //this.securityCameraTexture = new CGFtextureRTT(this, this.gl.canvas.width, this.gl.canvas.height);
     //this.securityCamera = new MySecurityCamera(this);
+
+    this.board = new MyBoard(this, [
+      [
+        "corner",
+        "bl",
+        "wt",
+        "bl",
+        "wt",
+        "bl",
+        "corner"
+      ],
+      [
+        "wt",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "bl"
+      ],
+      [
+        "wt",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "wt"
+      ],
+      [
+        "bl",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "bl"
+      ],
+      [
+        "bl",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "wt"
+      ],
+      [
+        "wt",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "bl"
+      ],
+      [
+        "corner",
+        "wt",
+        "bl",
+        "bl",
+        "wt",
+        "bl",
+        "corner"
+      ]
+    ]);
   }
 
   addViews(defaultCamera) {
@@ -204,6 +270,8 @@ class XMLscene extends CGFscene {
 
       // Displays the scene (MySceneGraph function).
       this.graph.displayScene();
+
+      this.board.display();
     }
 
     this.popMatrix();

@@ -91,6 +91,7 @@
                               
         <component id="scene">
             <transformation>
+                <translate x="0" y="-10" z="0" />
             </transformation>
             <materials>
                 <material id="whiteMaterial" />
@@ -98,12 +99,12 @@
             <texture id="none" />
             <children>
                 <componentref id="boardTest" />
-                <componentref id="player1Disc" />
-                <componentref id="player2Disc" />
+                <componentref id="whiteDisc" />
+                <componentref id="blackDisc" />
             </children>
         </component>
 
-        <component id="player1Disc">
+        <component id="whiteDisc">
             <transformation>
                 <translate x="0.5" y="0" z="0.5" />
                 <scale x="0.8" y="0.4" z="0.8" />
@@ -118,7 +119,7 @@
             </children>
         </component>
 
-        <component id="player2Disc">
+        <component id="blackDisc">
             <transformation>
                 <translate x="-0.5" y="0" z="-0.5" />
                 <scale x="0.8" y="0.4" z="0.8" />
