@@ -42,7 +42,7 @@ class XMLscene extends CGFscene {
     //this.securityCameraTexture = new CGFtextureRTT(this, this.gl.canvas.width, this.gl.canvas.height);
     //this.securityCamera = new MySecurityCamera(this);
 
-    this.board = new MyBoard(this, [
+    this.board = new MyGameBoard(this, [
       [
         "corner",
         "bl",
