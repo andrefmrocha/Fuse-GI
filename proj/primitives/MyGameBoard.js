@@ -1,6 +1,7 @@
 class MyGameBoard extends CGFobject {
     constructor(scene, jsonBoard) {
         super(scene);
+
         this.board = jsonBoard;
         this.rows = jsonBoard.length;
         this.cols = jsonBoard[0].length;
@@ -8,6 +9,8 @@ class MyGameBoard extends CGFobject {
         this.boardCell = new MyBoardCell(scene, true);
         this.disc = new MyDisc(scene);
         this.validCell = new MyValidCell(scene);
+
+        this.boardReady = false;
     }
 
     display() {
@@ -39,7 +42,7 @@ class MyGameBoard extends CGFobject {
                 this.scene.translate(0, 0.5, 0);
 
                 // display disc if it exists
-                if(boardCell != "empty") {
+                if(this.boardReady && boardCell != "empty") {
                     this.disc.setColor(boardCell);
                     this.disc.display();
                 }
@@ -63,5 +66,9 @@ class MyGameBoard extends CGFobject {
 
     movePiece(srow, scol, erow, ecol) {
         return;
+    }
+
+    setBoardReady(ready) {
+        this.boardReady = ready;
     }
 }
