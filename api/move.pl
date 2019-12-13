@@ -322,3 +322,5 @@ choose_move(Board, [Player, bot], [IC, IR, FC, FR], 3 - _):-
 	
 choose_move(Board, [Player, bot], [IC, IR, FC, FR], 4 - _):-
 	minimax(Board, Player , get_best_with_difference, [IC, IR]-[FC, FR]).
+
+transform_moves([IC, IR]-[FC, FR], [IC, IR, FC, FR]).
