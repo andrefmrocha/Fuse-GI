@@ -28,14 +28,15 @@ class MyGameBoard extends CGFobject {
 
                 // display board cell
                 this.scene.pushMatrix();
-                this.scene.translate(0, 0.5, 0);
+                this.scene.translate(0, .25, 0);
+                this.scene.scale(1, 0.5, 1);
                 this.boardCell.setInnerCell(boardCell == "empty");
                 this.boardCell.display();
                 this.scene.popMatrix();
 
                 // height of board surface
                 this.scene.pushMatrix();
-                this.scene.translate(0, 1, 0);
+                this.scene.translate(0, 0.5, 0);
 
                 if (row == 2 && col == 2) {
                     this.validCell.display();
