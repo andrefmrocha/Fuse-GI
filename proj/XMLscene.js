@@ -41,6 +41,74 @@ class XMLscene extends CGFscene {
 
     //this.securityCameraTexture = new CGFtextureRTT(this, this.gl.canvas.width, this.gl.canvas.height);
     //this.securityCamera = new MySecurityCamera(this);
+
+    this.auxBoardWhite = new MyAuxBoard(this, 10, "wt");
+    this.auxBoardBlack = new MyAuxBoard(this, 10, "bl");
+    this.board = new MyGameBoard(this, [
+      [
+        "corner",
+        "bl",
+        "wt",
+        "bl",
+        "wt",
+        "bl",
+        "corner"
+      ],
+      [
+        "wt",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "bl"
+      ],
+      [
+        "wt",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "wt"
+      ],
+      [
+        "bl",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "bl"
+      ],
+      [
+        "bl",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "wt"
+      ],
+      [
+        "wt",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "empty",
+        "bl"
+      ],
+      [
+        "corner",
+        "wt",
+        "bl",
+        "wt",
+        "wt",
+        "bl",
+        "corner"
+      ]
+    ]);
   }
 
   addViews(defaultCamera) {
@@ -204,7 +272,20 @@ class XMLscene extends CGFscene {
 
       // Displays the scene (MySceneGraph function).
       this.graph.displayScene();
-    }
+
+      this.board.display();
+      
+      this.pushMatrix();
+      this.translate(5, 0, 0);
+      this.auxBoardWhite.display();
+      this.popMatrix();
+
+      this.pushMatrix();
+      this.translate(-5, 0, 0);
+      this.rotate(Math.PI, 0, 1, 0);
+      this.auxBoardBlack.display();
+      this.popMatrix();
+}
 
     this.popMatrix();
     // ---- END Background, camera and axis setup

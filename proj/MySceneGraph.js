@@ -56,7 +56,6 @@ class MySceneGraph {
 
     // Here should go the calls for different functions to parse the various blocks
     var error = this.parseXMLFile(rootElement);
-
     if (error != null) {
       this.onXMLError(error);
       return;
@@ -410,6 +409,7 @@ class MySceneGraph {
   updateMaterial() {
     this.materialSwitch += 1;
   }
+
 
   /**
    * Displays the scene, processing each node, starting in the root node.

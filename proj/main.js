@@ -54,12 +54,18 @@ serialInclude([
   'MyInterface.js',
   'primitives/MyRectangle.js',
   'primitives/MyCylinder.js',
+  'primitives/MyBasedCylinder.js',
   'primitives/MySphere.js',
   'primitives/MyTriangle.js',
   'primitives/MyTorus.js',
   'primitives/MyPlane.js',
   'primitives/MyPatch.js',
   'primitives/MyCylinder2.js',
+  'primitives/MyBoardCell.js',
+  'primitives/MyGameBoard.js',
+  'primitives/MyAuxBoard.js',
+  'primitives/MyValidCell.js',
+  'primitives/MyDisc.js',
   'parser/PrimitivesParser.js',
   'parser/ViewsParser.js',
   'parser/TextureParser.js',
@@ -88,7 +94,7 @@ serialInclude([
     // get file name provided in URL, e.g. http://localhost/myproj/?file=myfile.xml
     // or use "demo.xml" as default (assumes files in subfolder "scenes", check MySceneGraph constructor)
 
-    var filename = getUrlVars()['file'] || 'demo.xml';
+    var filename = getUrlVars()['file'] || 'scene.xml';
 
     // create and load graph, and associate it to scene.
     // Check console for loading errors
