@@ -77,6 +77,7 @@ serialInclude([
   'animation/Animation.js',
   'animation/KeyframeAnimation.js',
   'MySecurityCamera.js',
+  'MyGameOrchestrator.js',
 
   (main = function() {
     // Standard application, scene and interface setup

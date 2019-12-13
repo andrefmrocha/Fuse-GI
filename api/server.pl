@@ -1,11 +1,13 @@
-:-use_module(library(http/http_server)).
-:-use_module(library(http/http_json)).
+:- use_module(library(http/http_server)).
+:- use_module(library(http/http_json)).
 :- use_module(library(http/http_error)).
-:-use_module(library(http/json)).
+:- use_module(library(http/json)).
 :- use_module(library(http/json_convert)).
-:-ensure_loaded('board_generation.pl').
-:-ensure_loaded('move.pl').
-:-ensure_loaded('points_calculation.pl').
+:- use_module(library(http/http_cors)).
+:- ensure_loaded('board_generation.pl').
+:- ensure_loaded('move.pl').
+:- ensure_loaded('points_calculation.pl').
+:- set_setting(http:cors, [*]).
 
 
 :- json_object
@@ -43,6 +45,7 @@ build_board(Request):-
     json_to_prolog(JSONIn, board_size(Columns, Rows)),
     initialize_empty_board(Rows, Columns, EmptyBoard),
     initialize_board(EmptyBoard, Board),
+    cors_enable,
     prolog_to_json(board(Board), JSONOut),
     reply_json(JSONOut).
 
