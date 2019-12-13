@@ -39,6 +39,7 @@
         <texture id="blueDisc" file="scenes/images/blue_disc.jpg" />
         <texture id="whiteDisc" file="scenes/images/white_disc.jpg" />
         <texture id="blackDisc" file="scenes/images/black_disc.jpg" />
+        <texture id="tableWood" file="scenes/images/table_wood.jpg" />
     </textures>
 
     <materials>
@@ -91,12 +92,109 @@
                               
         <component id="scene">
             <transformation>
-                <translate x="0" y="-10" z="0" />
+                <translate x="0" y="0" z="0" />
             </transformation>
             <materials>
                 <material id="whiteMaterial" />
             </materials>
             <texture id="none" />
+            <children>
+                <componentref id="table" />
+            </children>
+        </component>
+
+        <component id="table">
+            <transformation>
+                <translate x="0" y="-4.25" z="0" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="tableWood" />
+            <children>
+                <componentref id="tableTop" />
+                <componentref id="tableLeg1" />
+                <componentref id="tableLeg2" />
+                <componentref id="tableLeg3" />
+                <componentref id="tableLeg4" />
+            </children>
+        </component>
+
+        <component id="tableTop">
+            <transformation>
+                <translate x="0" y="4" z="0" />
+                <scale x="5" y="0.5" z="10" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <componentref id="unitCube" />
+            </children>
+        </component>
+
+        <component id="tableLeg1">
+            <transformation>
+                <translate x="-2.25" y="0" z="-4.75" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <componentref id="tableLeg" />
+            </children>
+        </component>
+
+        <component id="tableLeg2">
+            <transformation>
+                <translate x="2.25" y="0" z="-4.75" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <componentref id="tableLeg" />
+            </children>
+        </component>
+
+        <component id="tableLeg3">
+            <transformation>
+                <translate x="-2.25" y="0" z="4.75" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <componentref id="tableLeg" />
+            </children>
+        </component>
+
+        <component id="tableLeg4">
+            <transformation>
+                <translate x="2.25" y="0" z="4.75" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
+            <children>
+                <componentref id="tableLeg" />
+            </children>
+        </component>
+
+        <component id="tableLeg">
+            <transformation>
+                <translate x="0" y="2" z="0" />
+                <scale x="0.5" y="4" z="0.5" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="inherit" />
             <children>
                 <componentref id="unitCube" />
             </children>
