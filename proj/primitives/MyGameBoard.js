@@ -38,10 +38,6 @@ class MyGameBoard extends CGFobject {
                 this.scene.pushMatrix();
                 this.scene.translate(0, 0.5, 0);
 
-                if (row == 2 && col == 2) {
-                    this.validCell.display();
-                }
-
                 // display disc if it exists
                 if(boardCell != "empty") {
                     this.disc.setColor(boardCell);

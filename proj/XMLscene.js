@@ -42,6 +42,8 @@ class XMLscene extends CGFscene {
     //this.securityCameraTexture = new CGFtextureRTT(this, this.gl.canvas.width, this.gl.canvas.height);
     //this.securityCamera = new MySecurityCamera(this);
 
+    this.auxBoardWhite = new MyAuxBoard(this, 10, "wt");
+    this.auxBoardBlack = new MyAuxBoard(this, 10, "bl");
     this.board = new MyGameBoard(this, [
       [
         "corner",
@@ -101,7 +103,7 @@ class XMLscene extends CGFscene {
         "corner",
         "wt",
         "bl",
-        "bl",
+        "wt",
         "wt",
         "bl",
         "corner"
@@ -272,7 +274,18 @@ class XMLscene extends CGFscene {
       this.graph.displayScene();
 
       this.board.display();
-    }
+      
+      this.pushMatrix();
+      this.translate(5, 0, 0);
+      this.auxBoardWhite.display();
+      this.popMatrix();
+
+      this.pushMatrix();
+      this.translate(-5, 0, 0);
+      this.rotate(Math.PI, 0, 1, 0);
+      this.auxBoardBlack.display();
+      this.popMatrix();
+}
 
     this.popMatrix();
     // ---- END Background, camera and axis setup

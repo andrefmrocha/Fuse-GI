@@ -1,7 +1,7 @@
 class MyBoardCell extends CGFobject {
-    constructor(scene) {
+    constructor(scene, isInner) {
         super(scene);
-        this.isInner = true;
+        this.isInner = isInner != null ? isInner : true;
 
         this.rectangle = new MyRectangle(scene, -0.5, 0.5, -0.5, 0.5);
         this.initMaterial();
