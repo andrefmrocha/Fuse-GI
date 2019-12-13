@@ -1,6 +1,7 @@
 :-use_module(library(http/http_server)).
 :-use_module(library(http/http_json)).
 :- use_module(library(http/http_error)).
+:- use_module(library(http/http_cors)).
 :-use_module(library(http/json)).
 :- use_module(library(http/json_convert)).
 :-ensure_loaded('board_generation.pl').
@@ -11,6 +12,8 @@
 :- json_object
     board_size(columns: integer, lines: integer).
 
+
+:- set_setting(http:cors, [*]).
 
 :-json_object
     coords(xi: integer, yi: integer, xf: integer, yf: integer).
@@ -40,6 +43,7 @@
 
 build_board(Request):-
     http_read_json(Request, JSONIn),
+    cors_enable,
     json_to_prolog(JSONIn, board_size(Columns, Rows)),
     initialize_empty_board(Rows, Columns, EmptyBoard),
     initialize_board(EmptyBoard, Board),

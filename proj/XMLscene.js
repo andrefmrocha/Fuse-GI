@@ -109,6 +109,9 @@ class XMLscene extends CGFscene {
         "corner"
       ]
     ]);
+
+    
+    this.setPickEnabled(true);
   }
 
   addViews(defaultCamera) {
