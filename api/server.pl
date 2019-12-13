@@ -40,23 +40,45 @@
 
 :-http_handler(root(points), board_points, []).
 
+
+build_board(Request) :-
+      option(method(options), Request), !,
+      cors_enable(Request,
+                  [ methods([get,post,delete])
+                  ]),
+      format('~n'). 
+
 build_board(Request):-
+    cors_enable,
     http_read_json(Request, JSONIn),
     json_to_prolog(JSONIn, board_size(Columns, Rows)),
     initialize_empty_board(Rows, Columns, EmptyBoard),
     initialize_board(EmptyBoard, Board),
-    cors_enable,
     prolog_to_json(board(Board), JSONOut),
     reply_json(JSONOut).
 
+user_move(Request) :-
+      option(method(options), Request), !,
+      cors_enable(Request,
+                  [ methods([get,post,delete])
+                  ]),
+      format('~n'). 
 
 user_move(Request):-
+    cors_enable,
     http_read_json(Request, JSONIn),
     json_to_prolog(JSONIn, board_move(Board, Player)),
     valid_moves(Board, Player, Moves),
     maplist(transform_moves, Moves, NewMoves),
     prolog_to_json(board_moves(NewMoves), JSONOut),
     reply_json(JSONOut).
+
+bot_move(Request) :-
+      option(method(options), Request), !,
+      cors_enable(Request,
+                  [ methods([get,post,delete])
+                  ]),
+      format('~n'). 
 
 bot_move(Request):-
     http_read_json(Request, JSONIn),
@@ -66,12 +88,23 @@ bot_move(Request):-
     reply_json(JSONOut).
 
 bot_move(_):-
+    cors_enable,
     format('Status: 204~n'),
     format('Content-type: text/plain~n~n'),
     format('No valid moves~n').
 
 
+
+board_points(Request) :-
+      option(method(options), Request), !,
+      cors_enable(Request,
+                  [ methods([get,post,delete])
+                  ]),
+      format('~n'). 
+
+      
 board_points(Request):-
+    cors_enable,
     http_read_json(Request, JSONIn),
     json_to_prolog(JSONIn, board(Board)),
     value(Board, wt, Points0),

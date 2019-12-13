@@ -116,6 +116,10 @@ class MyGameOrchestrator extends CGFobject {
 function postRequest(url, body) {
     return fetch(url, {
         method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify(body)
     });
 }
