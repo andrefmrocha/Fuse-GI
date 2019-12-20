@@ -9,102 +9,43 @@ class MyGameOrchestrator extends CGFobject {
         this.playerPointsURL = serverURL + "/points";
 
 
+        this.gameReady = false;
         this.initGame();
 
-        this.auxBoardWhite = new MyAuxBoard(scene, 10, "wt");
-        this.auxBoardBlack = new MyAuxBoard(scene, 10, "bl");
-        this.board = new MyGameBoard(scene, [
-            [
-                "corner",
-                "bl",
-                "wt",
-                "bl",
-                "wt",
-                "bl",
-                "corner"
-            ],
-            [
-                "wt",
-                "empty",
-                "empty",
-                "empty",
-                "empty",
-                "empty",
-                "bl"
-            ],
-            [
-                "wt",
-                "empty",
-                "empty",
-                "empty",
-                "empty",
-                "empty",
-                "wt"
-            ],
-            [
-                "bl",
-                "empty",
-                "empty",
-                "empty",
-                "empty",
-                "empty",
-                "bl"
-            ],
-            [
-                "bl",
-                "empty",
-                "empty",
-                "empty",
-                "empty",
-                "empty",
-                "wt"
-            ],
-            [
-                "wt",
-                "empty",
-                "empty",
-                "empty",
-                "empty",
-                "empty",
-                "bl"
-            ],
-            [
-                "corner",
-                "wt",
-                "bl",
-                "wt",
-                "wt",
-                "bl",
-                "corner"
-            ]
-        ]);
+        this.auxBoardWhite = new MyAuxBoard(scene, 0, "wt");
+        this.auxBoardBlack = new MyAuxBoard(scene, 0, "bl");
+        this.board = new MyGameBoard(scene, [[]]);
     }
 
-    initGame() {
+    async initGame() {
+        // sizes must be between 2 and 7, inclusive
         const request = {
-            "columns": 5,
-            "lines": 5
+            columns: 3,
+            lines: 3
         };
 
-        let promise = postRequest(this.generateURL, request);
+        let genBoardResponse = await postRequest(this.generateURL, request);
+        let boardJson = await genBoardResponse.json();
+        this.board = new MyGameBoard(this.scene, boardJson.board);
+        
+        this.auxBoardWhite = new MyAuxBoard(this.scene, request.columns + request.lines, "wt");
+        this.auxBoardBlack = new MyAuxBoard(this.scene, request.columns + request.lines, "bl");
 
-        promise.then(
-            function(response) {
-                console.log(response);
-            }
-        );
+        this.gameReady = true;
     }
 
     display() {
+        if (!this.gameReady) return;
+
         this.board.display();
       
         this.scene.pushMatrix();
-        this.scene.translate(5, 0, 0);
+        this.scene.translate(7, 0, 0);
         this.auxBoardWhite.display();
         this.scene.popMatrix();
 
         this.scene.pushMatrix();
-        this.scene.translate(-5, 0, 0);
+        this.scene.translate(-7, 0, 0);
         this.scene.rotate(Math.PI, 0, 1, 0);
         this.auxBoardBlack.display();
         this.scene.popMatrix();
