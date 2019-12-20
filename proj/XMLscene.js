@@ -288,7 +288,7 @@ class XMLscene extends CGFscene {
       this.rotate(Math.PI, 0, 1, 0);
       this.auxBoardBlack.display();
       this.popMatrix();
-}
+    }
 
     this.popMatrix();
     // ---- END Background, camera and axis setup
