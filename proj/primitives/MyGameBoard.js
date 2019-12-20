@@ -10,12 +10,13 @@ class MyGameBoard extends CGFobject {
         this.disc = new MyDisc(scene);
         this.validCell = new MyValidCell(scene);
 
-        this.boardReady = false;
+        this.boardReady = true;
     }
 
     display() {
         const start_z = -this.rows/2 + 0.5;
         const start_x = -this.cols/2 + 0.5;
+        let i = 1;
         for (let row = 0; row < this.rows; row++) {
             const translate_z = start_z + row;
             for (let col = 0; col < this.cols; col++) {
@@ -41,11 +42,21 @@ class MyGameBoard extends CGFobject {
                 this.scene.pushMatrix();
                 this.scene.translate(0, 0.5, 0);
 
+                if(boardCell == "wt" || boardCell == "bl"){
+                    this.scene.registerForPick(i++, {
+                        x: col,
+                        y: row,
+                        cell: boardCell
+                    });
+                }
+
                 // display disc if it exists
                 if(this.boardReady && boardCell != "empty") {
                     this.disc.setColor(boardCell);
                     this.disc.display();
                 }
+
+
                 this.scene.popMatrix(); 
                 this.scene.popMatrix();
             }

@@ -44,7 +44,7 @@ class XMLscene extends CGFscene {
 
     this.auxBoardWhite = new MyAuxBoard(this, 10, "wt");
     this.auxBoardBlack = new MyAuxBoard(this, 10, "bl");
-    this.board = new MyGameBoard(this, [
+    this.boardState = [
       [
         "corner",
         "bl",
@@ -108,10 +108,47 @@ class XMLscene extends CGFscene {
         "bl",
         "corner"
       ]
-    ]);
+    ];
+    this.board = new MyGameBoard(this, this.boardState);
+
+    this.validCell = new MyValidCell(this);
 
     
     this.setPickEnabled(true);
+    this.getMoves();
+    this.possibleMoves = [];
+  }
+
+  async getMoves() {
+    const wtResponse = await fetch('http://localhost:8001/move', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        board: this.boardState,
+        player: 0
+      })
+    });
+
+    const wtmovesJson = await wtResponse.json();
+    this.wtMoves = wtmovesJson.move;
+
+    const blResponse = await fetch('http://localhost:8001/move', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        board: this.boardState,
+        player: 1
+      })
+    });
+
+    const blmovesJson = await blResponse.json();
+    this.blMoves = blmovesJson.move;
   }
 
   addViews(defaultCamera) {
@@ -277,10 +314,13 @@ class XMLscene extends CGFscene {
       this.graph.displayScene();
 
       this.board.display();
+      this.possibleMoves.forEach((move) => this.validCell.display(move));
+
       
       this.pushMatrix();
       this.translate(5, 0, 0);
       this.auxBoardWhite.display();
+      
       this.popMatrix();
 
       this.pushMatrix();
@@ -294,6 +334,26 @@ class XMLscene extends CGFscene {
     // ---- END Background, camera and axis setup
   }
 
+  logPicking(){
+    if (!this.pickMode && this.pickResults
+      && this.pickResults.length > 0 && this.blMoves) {
+      this.possibleMoves.splice(0, this.possibleMoves.length);  
+      const validResults = this.pickResults.filter(result => result[0]);
+      validResults.forEach(result => {
+        const cell = result[0];
+        const moves = cell.cell == "wt" ? this.wtMoves : this.blMoves;
+        moves.filter(move => move[0] == cell.x && move[1] == cell.y).forEach((move) => 
+          this.possibleMoves.push(
+            {
+              x: move[2], z: move[3],
+              size_x: this.boardState[0].length - 2, size_z: this.boardState.length - 2
+            }));
+      });
+
+      this.pickResults.splice(0, this.pickResults.length);
+    }
+  }
+
   display() {
 
     /*
@@ -301,6 +361,10 @@ class XMLscene extends CGFscene {
     this.render(this.secondaryCamera);
     this.securityCameraTexture.detachFromFrameBuffer();
     */
+
+    this.logPicking();
+		this.clearPickRegistration();
+
 
     this.render(this.sceneCamera);
 

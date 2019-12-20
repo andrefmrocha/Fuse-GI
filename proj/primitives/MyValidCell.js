@@ -17,11 +17,11 @@ class MyValidCell extends CGFobject {
         this.validMat.setTextureWrap('REPEAT', 'REPEAT');
     }
 
-    display() {
+    display(move) {
         this.scene.pushMatrix();
         this.validMat.apply();
         this.scene.scale(1, 3, 1);
-        this.scene.translate(0, 0.05, 0);
+        this.scene.translate(move.x - Math.ceil(move.size_x/2), 0.2, move.z - Math.ceil(move.size_z/2));
         this.scene.rotate(Math.PI/2, 1, 0, 0);
         this.torus.display();
         this.scene.popMatrix();
