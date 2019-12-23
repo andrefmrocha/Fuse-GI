@@ -70,6 +70,15 @@ initialize_empty_board(Rows, Columns, [Line |TBoard]) :-
 	N is NRows -1,
 	initialize_board_helper(N, NColumns, TBoard).
 
+
+count([], 0, _).
+count([Piece | T ], N, Piece) :- 
+	count(T, N1, Piece),
+	N is N1 + 1.
+count([_ | T ], N, Piece) :- 
+	count(T, N, Piece).
+
+
 %! initialize_board(+EmptyBoard, -InitializedBoard)
 % With the help of @see generate_pieces (generates the random order of the pieces) and
 % @see generate_board (places the generated pieces in the board), this function initializes
@@ -79,6 +88,8 @@ initialize_board([Line | TBoard], FinalBoard):-
 	length(Line, NColumns),
 	NPieces is (NColumns + NRows - 4) * 2,
     generate_pieces([], Pieces, NPieces),
+	count(Pieces, N, bl),
+	count(Pieces, N, wt),
 	generate_board([Line | TBoard], FinalBoard, Pieces).
 
 %! generate_board(+EmptyBoard, -InitializedBoard, +PiecesList)
