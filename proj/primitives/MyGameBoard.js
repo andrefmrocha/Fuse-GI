@@ -12,6 +12,10 @@ class MyGameBoard extends CGFobject {
 
         this.boardReady = true;
     }
+    
+    isInside(row, col){
+        return row >= 1 && row < this.rows - 1 && col >= 1 && col < this.cols - 1;
+    }
 
     display() {
         const start_z = -this.rows/2 + 0.5;
@@ -34,7 +38,7 @@ class MyGameBoard extends CGFobject {
                 this.scene.pushMatrix();
                 this.scene.translate(0, .25, 0);
                 this.scene.scale(1, 0.5, 1);
-                this.boardCell.setInnerCell(boardCell == "empty");
+                this.boardCell.setInnerCell(this.isInside(row, col));
                 this.boardCell.display();
                 this.scene.popMatrix();
 
@@ -42,18 +46,21 @@ class MyGameBoard extends CGFobject {
                 this.scene.pushMatrix();
                 this.scene.translate(0, 0.5, 0);
 
-                if(boardCell == "wt" || boardCell == "bl"){
-                    this.scene.registerForPick(i++, {
-                        x: col,
-                        y: row,
-                        cell: boardCell
-                    });
-                }
-
                 // display disc if it exists
                 if(this.boardReady && boardCell != "empty") {
+                    !this.isInside(row, col) && this.scene.registerForPick(registerCounter++,
+                        (scene) => {
+                            const moves = boardCell == "wt" ? scene.wtMoves : scene.blMoves;
+                            moves.filter(move => move[0] == col && move[1] == row).forEach((move) =>
+                                scene.possibleMoves.push({
+                                    move,
+                                    size_x: scene.boardState[0].length - 2, size_z: scene.boardState.length - 2
+                                }));
+                        }
+                    );
                     this.disc.setColor(boardCell);
                     this.disc.display();
+                    this.scene.clearPickRegistration();
                 }
 
 

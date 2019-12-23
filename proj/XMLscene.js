@@ -1,3 +1,6 @@
+let registerCounter = 1;
+
+
 /**
  * XMLscene class, representing the scene that is to be rendered.
  */
@@ -312,10 +315,6 @@ class XMLscene extends CGFscene {
 
       // Displays the scene (MySceneGraph function).
       this.graph.displayScene();
-
-      this.board.display();
-      this.possibleMoves.forEach((move) => this.validCell.display(move));
-
       
       this.pushMatrix();
       this.translate(5, 0, 0);
@@ -328,6 +327,9 @@ class XMLscene extends CGFscene {
       this.rotate(Math.PI, 0, 1, 0);
       this.auxBoardBlack.display();
       this.popMatrix();
+
+      this.board.display();
+      this.possibleMoves.forEach((move) => this.validCell.display(move));
     }
 
     this.popMatrix();
@@ -340,14 +342,7 @@ class XMLscene extends CGFscene {
       this.possibleMoves.splice(0, this.possibleMoves.length);  
       const validResults = this.pickResults.filter(result => result[0]);
       validResults.forEach(result => {
-        const cell = result[0];
-        const moves = cell.cell == "wt" ? this.wtMoves : this.blMoves;
-        moves.filter(move => move[0] == cell.x && move[1] == cell.y).forEach((move) => 
-          this.possibleMoves.push(
-            {
-              x: move[2], z: move[3],
-              size_x: this.boardState[0].length - 2, size_z: this.boardState.length - 2
-            }));
+        result[0](this);
       });
 
       this.pickResults.splice(0, this.pickResults.length);
@@ -363,7 +358,8 @@ class XMLscene extends CGFscene {
     */
 
     this.logPicking();
-		this.clearPickRegistration();
+    this.clearPickRegistration();
+    registerCounter = 1;
 
 
     this.render(this.sceneCamera);
