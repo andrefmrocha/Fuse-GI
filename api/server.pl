@@ -11,7 +11,7 @@
 
 
 :- json_object
-    board_size(columns: integer, lines: integer).
+    board_size(columns: integer, rows: integer).
 
 
 :-json_object

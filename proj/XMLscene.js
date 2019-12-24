@@ -169,6 +169,9 @@ class XMLscene extends CGFscene {
       this.graph.updateComponentAnimations(currentInstant);
     }
     //this.securityCamera.update(currTime);
+
+    this.gameOrchestrator.update(currTime);
+
   }
 
   checkKeys(eventCode) {
