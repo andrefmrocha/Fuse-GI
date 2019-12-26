@@ -1,9 +1,10 @@
 class MyAuxBoard extends CGFobject {
-    constructor(scene, nPieces, color, centerPos, piecesPositions) {
+    constructor(scene, nPieces, color, centerPos, piecesPositions, boardRotated) {
         super(scene);
         this.nPieces = nPieces;
-        this.cols = 5;
+        this.cols = 2;
         this.rows = Math.ceil(nPieces / this.cols);
+        this.boardRotated = boardRotated || false;
 
         this.centerPos = centerPos;
     
@@ -41,13 +42,14 @@ class MyAuxBoard extends CGFobject {
         const start_z = -this.rows/2 + 0.5;
         const start_x = -this.cols/2 + 0.5;
         for (let row = 0; row < this.rows; row++) {
-            const translate_z = start_z + row;
+            const rotated_row = this.boardRotated ? this.rows - 1 - row : row;
+            const translate_z = start_z + rotated_row;
             for (let col = 0; col < this.cols; col++) {
 
-                const translate_x = start_x + col;
+                const rotated_col = this.boardRotated ? col : this.cols - 1 - col;
+                const translate_x = start_x + rotated_col;
 
-                // must rotate 90 degrees because of transform applied
-                const cellPos = [translate_z, 0 , -translate_x];
+                const cellPos = [translate_x, 0 , translate_z];
                 const cellAbsolutePos = cellPos.map((val, i) => val + this.centerPos[i]);
 
                 // height of board surface
@@ -66,11 +68,11 @@ class MyAuxBoard extends CGFobject {
             const start = transforms.start;
             const end = transforms.end;
 
-            
+            // vector from current position to [0,0,0]
             const vec_to_origin = start.map(val => -val);
-            transforms.translate = vec_to_origin.map((val, i) => val + end[i]);
 
-            console.log("going from", transforms.start, " to ", transforms.end, ". translate is ", vec_to_origin.map((val, i) => val + end[i]));
+            // vector from start position to end position
+            transforms.translate = vec_to_origin.map((val, i) => val + end[i]);
         });
     }
 
@@ -78,56 +80,48 @@ class MyAuxBoard extends CGFobject {
 
         if (this.gameStarted) return;
 
-        this.scene.pushMatrix();
-        this.scene.rotate(-Math.PI/2, 0, 1, 0);
         let added_pieces = 0;
         const start_z = -this.rows/2 + 0.5;
         const start_x = -this.cols/2 + 0.5;
         for (let row = 0; row < this.rows; row++) {
-            const translate_z = start_z + row;
+            const rotated_row = this.boardRotated ? this.rows - 1 - row : row;
+            const translate_z = start_z + rotated_row;
             for (let col = 0; col < this.cols; col++) {
 
-                const translate_x = start_x + col;
-                
-                this.scene.pushMatrix();
-                this.scene.translate(translate_x, 0, translate_z);
+                const rotated_col = this.boardRotated ? col : this.cols - 1 - col;
+                const translate_x = start_x + rotated_col;
 
                 // display board cell in its position
                 this.scene.pushMatrix();
-                this.scene.translate(0, .25, 0);
+                this.scene.translate(translate_x, .25, translate_z);
                 this.scene.scale(1, 0.5, 1);
                 this.boardCell.display();
                 this.scene.popMatrix();
 
                 // height of board surface
                 if (added_pieces < this.nPieces) {
-                    this.scene.pushMatrix();
-                    // position the disc at board height
-                    this.scene.translate(0, 0.5, 0);
 
                     this.scene.pushMatrix();
 
                     // object animation transformations
-                    const translate = this.piecesTransformations[added_pieces].translate;
-                    const scale = this.piecesTransformations[added_pieces].scale;
-                    const rotate = this.piecesTransformations[added_pieces].rotate;
+                    const anim_translate = this.piecesTransformations[added_pieces].translate;
+                    const anim_scale = this.piecesTransformations[added_pieces].scale;
+                    const anim_rotate = this.piecesTransformations[added_pieces].rotate;
                     
-                    this.scene.translate(...translate);
-                    this.scene.rotate(rotate.z, 0, 0, 1);
-                    this.scene.rotate(rotate.y, 0, 1, 0);
-                    this.scene.rotate(rotate.x, 1, 0, 0);
-                    this.scene.scale(...scale);
+                    this.scene.translate(...anim_translate);
+                    this.scene.translate(translate_x, 0.5, translate_z);
+
+                    this.scene.rotate(anim_rotate.z, 0, 0, 1);
+                    this.scene.rotate(anim_rotate.y, 0, 1, 0);
+                    this.scene.rotate(anim_rotate.x, 1, 0, 0);
+
+                    this.scene.scale(...anim_scale);
 
                     this.disc.display();
                     this.scene.popMatrix();
-
-                    this.scene.popMatrix(); 
                     added_pieces++;
                 }
-
-                this.scene.popMatrix();
             }
         }
-        this.scene.popMatrix();
     }
 }

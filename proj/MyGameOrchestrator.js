@@ -35,7 +35,7 @@ class MyGameOrchestrator extends CGFobject {
 
         const piecesPositions = this.determinePiecesInitialPositions(boardJson.board); 
         this.auxBoardWhite = new MyAuxBoard(this.scene, piecesPositions["wt"].length, "wt", this.whiteBoardPos, piecesPositions);
-        this.auxBoardBlack = new MyAuxBoard(this.scene, piecesPositions["bl"].length, "bl", this.blackBoardPos, piecesPositions);
+        this.auxBoardBlack = new MyAuxBoard(this.scene, piecesPositions["bl"].length, "bl", this.blackBoardPos, piecesPositions, true);
 
         this.gameReady = true;
     }
@@ -94,7 +94,6 @@ class MyGameOrchestrator extends CGFobject {
 
         this.scene.pushMatrix();
         this.scene.translate(...this.blackBoardPos);
-        this.scene.rotate(Math.PI, 0, 1, 0);
         this.auxBoardBlack.display();
         this.scene.popMatrix();
     }
