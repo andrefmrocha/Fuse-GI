@@ -73,10 +73,10 @@ class MyGameOrchestrator extends CGFobject {
             this.auxBoardBlack.update(time);
             this.auxBoardWhite.update(time);
 
-            if (this.auxBoardBlack.finishedAnimation && this.auxBoardWhite.finishedAnimation) {
+            if (this.auxBoardBlack.startAnimationFinished() && this.auxBoardWhite.startAnimationFinished()) {
                 this.piecesInBoard = true;
-                this.auxBoardBlack.gameStarted = true;
-                this.auxBoardWhite.gameStarted = true;
+                this.auxBoardBlack.setGameStarted(true);
+                this.auxBoardWhite.setGameStarted(true);
                 this.board.setBoardReady(true);
             }
         }

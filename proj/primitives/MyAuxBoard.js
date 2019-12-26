@@ -12,9 +12,11 @@ class MyAuxBoard extends CGFobject {
         this.disc = new MyDisc(scene, color);
 
         // Start animation variables
-        this.startAnimationDuration = 5;
-        this.finishedStartAnimation = false;
-        this.gameStarted = false;
+        this.startAnimationDuration = 3;
+        this.startAnimationHeight = 6;
+        this.startAnimationRotations = 5;
+        this.finishedStartAnimation = false; // checked by game orchestrator
+        this.gameStarted = false; // set by game orchestrator
 
         // calculate start position of pieces
         const startPositions = this.calculateInitialPiecesPositions();
@@ -36,6 +38,14 @@ class MyAuxBoard extends CGFobject {
         }
     }
 
+    startAnimationFinished() {
+        return this.startAnimationFinished == true;
+    }
+
+    setGameStarted(val) {
+        this.gameStarted = val;
+    }
+
     calculateInitialPiecesPositions() {
 
         let piecesPositions = [];
@@ -51,7 +61,7 @@ class MyAuxBoard extends CGFobject {
                 const rotated_col = this.boardRotated ? col : this.cols - 1 - col;
                 const translate_x = start_x + rotated_col;
 
-                const cellPos = [translate_x, 0 , translate_z];
+                const cellPos = [translate_x, 0 ,translate_z];
                 const cellAbsolutePos = cellPos.map((val, i) => val + this.centerPos[i]);
 
                 // height of board surface
@@ -75,32 +85,51 @@ class MyAuxBoard extends CGFobject {
 
             // proportion of time since animation started
             const time_factor = (time - this.startAnimStartTime) / (this.startAnimEndTime - this.startAnimStartTime);
-            if (time_factor > 1) {
+            
+            // animation finished
+            if (time_factor > 1) { 
                 this.finishedStartAnimation = true;
+                
+                // place pieces at their end position with no rotation
+                Object.keys(this.piecesTransformations).forEach( key => {
+                    const transforms = this.piecesTransformations[key];
+                    const anim_translate = transforms.start.map((val, i) => -val + transforms.end[i]);
+                    transforms.translate = anim_translate;
+                    transforms.rotate.z = 0;
+                });
             }
+            // animation in progress
             else {
-                Object.keys(this.piecesTransformations).forEach( (key, key_i) => {
+                Object.keys(this.piecesTransformations).forEach( key => {
 
                     const transforms = this.piecesTransformations[key];
         
                     const start = transforms.start;
-                    const end = transforms.end;
-        
-                    // vector from current position to [0,0,0]
-                    const vec_to_end = start.map((val, i) => -val + end[i]);
+                    const end = transforms.end; 
 
-                    const curr_translate = vec_to_end.map((val, i) => val * time_factor);       
+                    // parabolic path
+                    const anim_x = (1-time_factor)*start[0] + time_factor * end[0];
+                    const anim_z = (1-time_factor)*start[2] + time_factor * end[2];
+
+                    // symmetric parabole from start to end with height this.startAnimationHeight
+                    const anim_y = -4 * this.startAnimationHeight * Math.pow(time_factor, 2) + 
+                                    4 * this.startAnimationHeight * time_factor;
+                    const anim_vals = [anim_x, anim_y, anim_z];
+
+                    // vector from start to animation position
+                    const anim_translate = start.map((val, i) => -val + anim_vals[i]);
         
                     // vector from start position to end position
-                    transforms.translate = curr_translate;
+                    transforms.translate = anim_translate;
+
+                    // rotation around z axis
+                    transforms.rotate.z = 2*Math.PI * time_factor * this.startAnimationRotations;
                 });
             }                
         }        
     }
 
     display() {
-
-        if (this.gameStarted) return;
 
         let added_pieces = 0;
         const start_z = -this.rows/2 + 0.5;
