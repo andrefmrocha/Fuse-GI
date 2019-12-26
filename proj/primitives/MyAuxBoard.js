@@ -11,7 +11,9 @@ class MyAuxBoard extends CGFobject {
         this.boardCell = new MyBoardCell(scene, false);
         this.disc = new MyDisc(scene, color);
 
-        this.finishedAnimation = false;
+        // Start animation variables
+        this.startAnimationDuration = 5;
+        this.finishedStartAnimation = false;
         this.gameStarted = false;
 
         // calculate start position of pieces
@@ -63,17 +65,37 @@ class MyAuxBoard extends CGFobject {
     }
 
     update(time) {
-        Object.keys(this.piecesTransformations).forEach( (key, key_i) => {
-            const transforms = this.piecesTransformations[key];
-            const start = transforms.start;
-            const end = transforms.end;
+        if (!this.finishedStartAnimation) {
 
-            // vector from current position to [0,0,0]
-            const vec_to_origin = start.map(val => -val);
+            // determine start time if not started yet
+            if (!this.startAnimStartTime) {
+                this.startAnimStartTime = time;
+                this.startAnimEndTime = time + this.startAnimationDuration * 1000;
+            }
 
-            // vector from start position to end position
-            transforms.translate = vec_to_origin.map((val, i) => val + end[i]);
-        });
+            // proportion of time since animation started
+            const time_factor = (time - this.startAnimStartTime) / (this.startAnimEndTime - this.startAnimStartTime);
+            if (time_factor > 1) {
+                this.finishedStartAnimation = true;
+            }
+            else {
+                Object.keys(this.piecesTransformations).forEach( (key, key_i) => {
+
+                    const transforms = this.piecesTransformations[key];
+        
+                    const start = transforms.start;
+                    const end = transforms.end;
+        
+                    // vector from current position to [0,0,0]
+                    const vec_to_end = start.map((val, i) => -val + end[i]);
+
+                    const curr_translate = vec_to_end.map((val, i) => val * time_factor);       
+        
+                    // vector from start position to end position
+                    transforms.translate = curr_translate;
+                });
+            }                
+        }        
     }
 
     display() {
