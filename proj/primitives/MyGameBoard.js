@@ -47,11 +47,12 @@ class MyGameBoard extends CGFobject {
                 this.scene.translate(0, 0.5, 0);
 
                 // display disc if it exists
-                if(this.boardReady && boardCell != "empty") {
+                if(this.boardReady && boardCell != "empty" && boardCell != "null") {
                     !this.isInside(row, col) && this.scene.registerForPick(registerCounter++,
                         (scene) => {
                             const moves = boardCell == "wt" ? scene.wtMoves : scene.blMoves;
-                            moves.filter(move => move[0] == col && move[1] == row).forEach((move) =>
+                            const validMoves = moves.filter(move => move[0] == col && move[1] == row);
+                            validMoves.forEach((move) =>
                                 scene.possibleMoves.push({
                                     move,
                                     size_x: scene.boardState[0].length - 2, size_z: scene.boardState.length - 2

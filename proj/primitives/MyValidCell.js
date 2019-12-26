@@ -27,7 +27,6 @@ class MyValidCell extends CGFobject {
         this.scene.pushMatrix();
         this.validMat.apply();
         this.scene.scale(1, 3, 1);
-        // console.log(move.move);
         this.scene.translate(move.move[2] - Math.ceil(move.size_x / 2), 0.2, move.move[3] - Math.ceil(move.size_z / 2));
         this.scene.rotate(Math.PI / 2, 1, 0, 0);
         this.scene.registerForPick(registerCounter++, (scene) => {
@@ -45,10 +44,8 @@ class MyValidCell extends CGFobject {
                     }
                 }
 
-                console.log(indexes);
-
                 indexes.forEach((index, i) => {
-                    const distance = reachingIndex + i + ((zMove > 0) ? 1 : -1);
+                    const distance = reachingIndex + i + ((zMove > 0) ? i + 1 : -i - 1);
                     board[distance][move.move[0]] = board[index][move.move[0]];
                     board[index][move.move[0]] = "empty";
                 });
@@ -65,14 +62,14 @@ class MyValidCell extends CGFobject {
                 }
 
                 indexes.forEach((index, i) => {
-                    const distance = reachingIndex + i + ((xMove > 0) ? 1: -1);
+                    const distance = reachingIndex + ((xMove > 0) ? i + 1: -i -1);
                     row[distance] = row[index];
                     row[index] = "empty";
                 })
             }
 
             board[move.move[3]][move.move[2]] = board[move.move[1]][move.move[0]];
-            board[move.move[1]][move.move[0]] = "empty";
+            board[move.move[1]][move.move[0]] = "null";
             scene.getMoves();
         });
         this.torus.display();
