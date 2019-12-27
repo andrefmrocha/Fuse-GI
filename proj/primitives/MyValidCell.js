@@ -2,6 +2,7 @@ class MyValidCell extends CGFobject {
     constructor(scene) {
         super(scene);
 
+        
         this.selection = new MyBasedCylinder(scene, 0.2, 0.5, 0.5, 20, 20);
         this.initMaterial();
     }
