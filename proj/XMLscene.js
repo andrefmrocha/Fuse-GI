@@ -36,7 +36,7 @@ class XMLscene extends CGFscene {
     this.gl.depthFunc(this.gl.LEQUAL);
 
     this.axis = new CGFaxis(this);
-    this.setUpdatePeriod(1000/30); // 30 fps
+    this.setUpdatePeriod(1000 / 30); // 30 fps
     this.viewsList = [];
     this.viewsIDs = {};
     this.views = {};
@@ -45,82 +45,14 @@ class XMLscene extends CGFscene {
     //this.securityCameraTexture = new CGFtextureRTT(this, this.gl.canvas.width, this.gl.canvas.height);
     //this.securityCamera = new MySecurityCamera(this);
 
-    this.auxBoardWhite = new MyAuxBoard(this, 10, "wt");
-    this.auxBoardBlack = new MyAuxBoard(this, 10, "bl");
-    this.boardState = [
-      [
-        "corner",
-        "bl",
-        "wt",
-        "bl",
-        "wt",
-        "bl",
-        "corner"
-      ],
-      [
-        "wt",
-        "empty",
-        "empty",
-        "empty",
-        "empty",
-        "empty",
-        "bl"
-      ],
-      [
-        "wt",
-        "empty",
-        "empty",
-        "empty",
-        "empty",
-        "empty",
-        "wt"
-      ],
-      [
-        "bl",
-        "empty",
-        "empty",
-        "empty",
-        "empty",
-        "empty",
-        "bl"
-      ],
-      [
-        "bl",
-        "empty",
-        "empty",
-        "empty",
-        "empty",
-        "empty",
-        "wt"
-      ],
-      [
-        "wt",
-        "empty",
-        "empty",
-        "empty",
-        "empty",
-        "empty",
-        "bl"
-      ],
-      [
-        "corner",
-        "wt",
-        "bl",
-        "wt",
-        "wt",
-        "bl",
-        "corner"
-      ]
-    ];
-    this.board = new MyGameBoard(this, this.boardState);
-
-    this.validCell = new MyValidCell(this);
-
-    
+    this.gameOrchestrator = new MyGameOrchestrator(this);
     this.setPickEnabled(true);
     this.getMoves();
     this.possibleMoves = [];
+
+
   }
+
 
   async getMoves() {
     const wtResponse = await fetch('http://localhost:8001/move', {
@@ -186,7 +118,7 @@ class XMLscene extends CGFscene {
    */
   initLights() {
     // Reads the lights from the scene graph.
-    this.lightsState={};
+    this.lightsState = {};
     Object.keys(this.graph.lights).forEach((key, index) => {
       if (index < 8) { // Only eight lights allowed by WebGL.
         const light = this.graph.lights[key];
@@ -222,21 +154,21 @@ class XMLscene extends CGFscene {
     this.addLightsToInterface();
   }
 
-  addLightsToInterface(){
+  addLightsToInterface() {
     Object.keys(this.lightsState).forEach(key => {
       this.interface.gui.add(this.lightsState[key], 'isEnabled').name(key);
     });
   }
 
-  updateLights(){
+  updateLights() {
     Object.keys(this.lightsState).forEach(key => {
       const currentLightState = this.lightsState[key];
       const currentLight = this.lights[currentLightState.lightIndex];
-      if(currentLightState.isEnabled)
+      if (currentLightState.isEnabled)
         currentLight.enable();
       else
-        currentLight.disable();  
-      currentLight.update();  
+        currentLight.disable();
+      currentLight.update();
     })
   }
 
@@ -272,11 +204,14 @@ class XMLscene extends CGFscene {
   }
 
   update(currTime) {
-    if(this.sceneInited){
+    if (this.sceneInited) {
       const currentInstant = currTime - this.time;
       this.graph.updateComponentAnimations(currentInstant);
     }
     //this.securityCamera.update(currTime);
+
+    this.gameOrchestrator.update(currTime);
+
   }
 
   checkKeys(eventCode) {
@@ -304,22 +239,22 @@ class XMLscene extends CGFscene {
 
     // Apply transformations corresponding to the camera position relative to the origin
     this.applyViewMatrix();
-    
+
     this.pushMatrix();
     this.axis.display();
-    
+
     if (this.sceneInited) {
       // Draw axis
-      this.updateLights(); 
+      this.updateLights();
       this.setDefaultAppearance();
 
       // Displays the scene (MySceneGraph function).
       this.graph.displayScene();
-      
+
       this.pushMatrix();
       this.translate(5, 0, 0);
       this.auxBoardWhite.display();
-      
+
       this.popMatrix();
 
       this.pushMatrix();
@@ -336,10 +271,10 @@ class XMLscene extends CGFscene {
     // ---- END Background, camera and axis setup
   }
 
-  logPicking(){
+  logPicking() {
     if (!this.pickMode && this.pickResults
       && this.pickResults.length > 0 && this.blMoves) {
-      this.possibleMoves.splice(0, this.possibleMoves.length);  
+      this.possibleMoves.splice(0, this.possibleMoves.length);
       const validResults = this.pickResults.filter(result => result[0]);
       validResults.forEach(result => {
         result[0](this);

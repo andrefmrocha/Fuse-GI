@@ -1,8 +1,7 @@
 :- use_module(library(http/http_server)).
 :- use_module(library(http/http_json)).
 :- use_module(library(http/http_error)).
-:- use_module(library(http/http_cors)).
-:-use_module(library(http/json)).
+:- use_module(library(http/json)).
 :- use_module(library(http/json_convert)).
 :- use_module(library(http/http_cors)).
 :- ensure_loaded('board_generation.pl').
@@ -12,7 +11,7 @@
 
 
 :- json_object
-    board_size(columns: integer, lines: integer).
+    board_size(columns: integer, rows: integer).
 
 
 :- set_setting(http:cors, [*]).

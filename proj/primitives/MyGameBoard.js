@@ -10,7 +10,8 @@ class MyGameBoard extends CGFobject {
         this.disc = new MyDisc(scene);
         this.validCell = new MyValidCell(scene);
 
-        this.boardReady = true;
+        this.boardReady = false;
+        this.surfaceHeight = 0.5;
     }
     
     isInside(row, col){
@@ -44,7 +45,7 @@ class MyGameBoard extends CGFobject {
 
                 // height of board surface
                 this.scene.pushMatrix();
-                this.scene.translate(0, 0.5, 0);
+                this.scene.translate(0, this.surfaceHeight, 0);
 
                 // display disc if it exists
                 if(this.boardReady && boardCell != "empty" && boardCell != "null") {
