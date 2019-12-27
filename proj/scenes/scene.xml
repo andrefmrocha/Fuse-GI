@@ -188,7 +188,7 @@
             <materials>
                 <material id="inherit" />
             </materials>
-            <texture id="tableWood" />
+            <texture id="tableWood" length_s="1" length_t="1" />
             <children>
                 <componentref id="tableTopOblong" />
                 <componentref id="tableLeg1" />
@@ -206,7 +206,7 @@
             <materials>
                 <material id="inherit" />
             </materials>
-            <texture id="tableWood" />
+            <texture id="tableWood" length_s="1" length_t="1" />
             <children>
                 <componentref id="tableTop" />
                 <componentref id="tableLeg1" />
@@ -233,7 +233,7 @@
         <component id="tableTopOblong">
             <transformation>
                 <translate x="0" y="4" z="0" />
-                <scale x="5" y="0.1" z="10" />
+                <scale x="5" y="0.1" z="11" />
             </transformation>
             <materials>
                 <material id="inherit" />
