@@ -52,10 +52,10 @@ class XMLscene extends CGFscene {
     this.interface.gui.remove(this.currentViewGUI);
     this.interface.gui.remove(this.ambientViewGUI);
 
-    this.lightsGUI = {};
-    Object.keys(this.lightsGUI).forEach((k,i) => {
+    Object.keys(this.lightsGUI).forEach(k => {
       this.interface.gui.remove(this.lightsGUI[k]);
     });
+    this.lightsGUI = {};
   }
 
   addViews(defaultCamera) {
@@ -92,8 +92,11 @@ class XMLscene extends CGFscene {
    */
   initLights() {
     // Reads the lights from the scene graph.
-    this.lightsState = {};
-    const lights = this.graph.ambients[this.graph.selectedAmbient].lights
+    this.lightsState = {};    
+    
+    Object.keys(this.lights).forEach(key => this.lights[key].visible = false);
+
+    const lights = this.graph.ambients[this.graph.selectedAmbient].lights;
     Object.keys(lights).forEach((key, index) => {
       if (index < 8) { // Only eight lights allowed by WebGL.
         const light = lights[key];

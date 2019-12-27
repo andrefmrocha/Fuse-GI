@@ -58,12 +58,27 @@ class MySceneGraph {
     Change selected ambient and load it if needed
   */
   onSelectedAmbient() {
+    // new ambient, load it
     if (Object.keys(this.ambients[this.newAmbient]).length == 0) {
       this.ambients[this.newAmbient] = {};
       parserUtils.reader.open('scenes/' + this.ambientsNames[this.newAmbient], this);
     }
+    // ambient already in memory
     else {
+      let anims = this.getAnimations();
+      Object.keys(anims).forEach((key) => {
+        anims[key].initialTime = 0; 
+      });
+  
       this.selectedAmbient = this.newAmbient;
+      this.scene.resetGUI();
+      
+      this.scene.views = this.ambients[this.selectedAmbient].perspectives;
+      this.scene.addViews(this.ambients[this.selectedAmbient].defaultCamera);
+      this.scene.onSelectedView();
+
+      this.scene.addAmbients();
+      this.scene.onGraphLoaded();
     }
   }
 
@@ -107,7 +122,6 @@ class MySceneGraph {
 
     this.selectedAmbient = this.newAmbient;
 
-    console.log("loaded");
     this.scene.onGraphLoaded();
   }
 
@@ -278,6 +292,8 @@ class MySceneGraph {
 
     const defaultCamera = parserUtils.reader.getString(viewsNode, 'default');
     if (!defaultCamera) this.onXMLError('default camera not specified');
+
+    this.ambients[this.newAmbient].defaultCamera = defaultCamera;
 
     this.scene.addViews(defaultCamera);
     this.scene.onSelectedView();
