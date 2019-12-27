@@ -18,9 +18,38 @@
         width: 100%;
         height: 100%;
       }
+
+      #panel{
+        margin: 2em 0 0 2em;
+        position: absolute;
+        width: 20vw;
+        padding: 1em;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      #panel > h1 ,
+      #panel > div{
+        text-align: center;
+      }
     </style>
   </head>
   <body>
     <script src="main.js"></script>
+      <div id="panel">
+        <h1>FUSE</h1>
+        <div>
+          Player: <span id="player">None</span>
+        </div>
+        <div>
+          White Score: <span id="white-score">0</span>
+        </div>
+        <div>
+          Black Score: <span id="black-score">0</span>
+        </div>
+        <div>
+          <span id="time"></span> <!--For later purpose-->
+        </div>
+      </div>
   </body>
 </html>

@@ -2,7 +2,7 @@ class MyValidCell extends CGFobject {
     constructor(scene) {
         super(scene);
 
-        
+
         this.selection = new MyBasedCylinder(scene, 0.2, 0.5, 0.5, 20, 20);
         this.initMaterial();
     }
@@ -26,7 +26,7 @@ class MyValidCell extends CGFobject {
         this.scene.translate(move.move[2] - Math.ceil(move.size_x / 2), 0.2, move.move[3] - Math.ceil(move.size_z / 2));
         this.scene.rotate(Math.PI / 2, 1, 0, 0);
         this.scene.gameOrchestrator.registerMovement(move);
-        this.torus.display();
+        this.selection.display();
         this.scene.popMatrix();
     }
 }
