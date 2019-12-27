@@ -79,9 +79,10 @@ class XMLscene extends CGFscene {
   initLights() {
     // Reads the lights from the scene graph.
     this.lightsState={};
-    Object.keys(this.graph.lights).forEach((key, index) => {
+    const lights = this.graph.getLights();
+    Object.keys(lights).forEach((key, index) => {
       if (index < 8) { // Only eight lights allowed by WebGL.
-        const light = this.graph.lights[key];
+        const light = lights[key];
 
         const attenuation = light[6];
         this.lights[index].setPosition(light[2][0], light[2][1], light[2][2], light[2][3]);
@@ -144,18 +145,20 @@ class XMLscene extends CGFscene {
   onGraphLoaded() {
     this.axis = new CGFaxis(this, this.graph.referenceLength);
 
+    const background_color = this.graph.getBackground();
+    const global_ambient = this.graph.getGlobalAmbient();
     this.gl.clearColor(
-      this.graph.background[0],
-      this.graph.background[1],
-      this.graph.background[2],
-      this.graph.background[3]
+      background_color[0],
+      background_color[1],
+      background_color[2],
+      background_color[3]
     );
 
     this.setGlobalAmbientLight(
-      this.graph.ambient[0],
-      this.graph.ambient[1],
-      this.graph.ambient[2],
-      this.graph.ambient[3]
+      global_ambient[0],
+      global_ambient[1],
+      global_ambient[2],
+      global_ambient[3]
     );
 
     this.initLights();

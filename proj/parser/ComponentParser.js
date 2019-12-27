@@ -6,7 +6,8 @@ const componentParser = {
   parseComponents: (componentsNode, sceneGraph) => {
     const children = componentsNode.children;
 
-    sceneGraph.components = {};
+    sceneGraph.ambients[sceneGraph.selectedAmbient].components = {};
+    const comps = sceneGraph.getComponents();
 
     // Any number of components.
     for (let i = 0; i < children.length; i++) {
@@ -20,7 +21,7 @@ const componentParser = {
       if (!componentID) return 'no ID defined for componentID';
 
       // Checks for repeated IDs.
-      if (sceneGraph.components[componentID] != null)
+      if (comps[componentID] != null)
         return 'ID must be unique for each component (conflict: ID = ' + componentID + ')';
 
       const grandChildren = children[i].children;
@@ -62,7 +63,7 @@ const componentParser = {
       // Materials
       currentComponent.materials = componentParser.parseComponentMaterials(
         grandChildren[materialsIndex].getElementsByTagName('material'),
-        sceneGraph.materials
+        sceneGraph.getMaterials()
       );
 
       // Texture
@@ -74,7 +75,7 @@ const componentParser = {
       // Children
       currentComponent.children = componentParser.parsePrimitiveChildren(
         grandChildren[childrenIndex].getElementsByTagName('primitiveref'),
-        sceneGraph.primitives
+        sceneGraph.getPrimitives()
       );
       currentComponent.children = currentComponent.children.concat(
         componentParser.parseComponentChildren(
@@ -100,7 +101,7 @@ const componentParser = {
         sceneGraph.onXMLError("Component parser, missing children");
       }
       else {
-        sceneGraph.components[componentID] = currentComponent;
+        comps[componentID] = currentComponent;
       }
     }
   },
@@ -110,7 +111,7 @@ const componentParser = {
    * @param  {MySceneGraph} sceneGraph
    */
   parseComponentTexture: (textureRef, sceneGraph) => {
-    const textures = sceneGraph.textures;
+    const textures = sceneGraph.getTextures();
     const textureID = parserUtils.reader.getString(textureRef, 'id');
     if (!textureID) console.error("missing texture ID");
 
@@ -145,7 +146,7 @@ const componentParser = {
    * @param  {MySceneGraph} sceneGraph
    */
   parseComponentTransformations: (componentTransformation, sceneGraph) => {
-    const transformations = sceneGraph.transformations;
+    const transformations = sceneGraph.getTransformations();
     const transformationChildren = [];
     for (var j = 0; j < componentTransformation.length; j++) {
       transformationChildren.push(componentTransformation[j].nodeName);
@@ -209,6 +210,6 @@ const componentParser = {
   parseAnimationChildren: (animationsNode, sceneGraph) => {
     const id = parserUtils.reader.getString(animationsNode, 'id');
     if (!id) sceneGraph.onXMLError('No id on animation ref');
-    return sceneGraph.animations[id];
+    return sceneGraph.ambients[sceneGraph.selectedAmbient].animations[id];
   }
 }

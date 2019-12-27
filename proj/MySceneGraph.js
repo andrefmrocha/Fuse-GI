@@ -21,7 +21,7 @@ class MySceneGraph {
    * @constructor
    */
 
-  constructor(filename, scene) {
+  constructor(ambientsNames, scene) {
     this.DEGREE_TO_RAD = Math.PI / 180;
     this.loadedOk = true;
 
@@ -39,13 +39,42 @@ class MySceneGraph {
     this.axisCoords['y'] = [0, 1, 0];
     this.axisCoords['z'] = [0, 0, 1];
 
+    // Store the name of all valid ambients
+    this.ambients = {0 : {}};
+    this.ambientsNames = ambientsNames;
+    this.selectedAmbient = 0;
+
     /*
      * Read the contents of the xml file, and refer to this class for loading and error handlers.
      * After the file is read, the reader calls onXMLReady on this object.
      * If any error occurs, the reader calls onXMLError on this object, with an error message
      */
-    parserUtils.reader.open('scenes/' + filename, this);
+    parserUtils.reader.open('scenes/' + this.ambientsNames[this.selectedAmbient], this);
   }
+
+  /*
+    Change selected ambient and load it if needed
+  */
+  changeAmbient(selected) {
+    this.selectedAmbient = selected;
+    if (!this.ambients[selected]) {
+      this.ambients[selected] = {};
+      parserUtils.reader.open('scenes/' + this.ambientsNames[this.selectedAmbient], this);
+    }
+  }
+
+  getAmbientName() { return this.ambientsNames[this.selectedAmbient]; }
+  getIDRoot() { return this.ambients[this.selectedAmbient].idRoot; }
+  getPrimitives() { return this.ambients[this.selectedAmbient].primitives; }
+  getComponents() { return this.ambients[this.selectedAmbient].components; }
+  getMaterials() { return this.ambients[this.selectedAmbient].materials; }
+  getTextures() { return this.ambients[this.selectedAmbient].textures; }
+  getTransformations() { return this.ambients[this.selectedAmbient].transformations; }
+  getAnimations() { return this.ambients[this.selectedAmbient].animations; }
+  getPerspectives() { return this.ambients[this.selectedAmbient].perspectives; }
+  getLights() { return this.ambients[this.selectedAmbient].lights; }
+  getBackground() { return this.ambients[this.selectedAmbient].background; }
+  getGlobalAmbient() { return this.ambients[this.selectedAmbient].ambient; }
 
   /*
    * Callback to be executed after successful reading
@@ -61,13 +90,15 @@ class MySceneGraph {
       return;
     }
     
-    this.assignChildReferences(this.components[this.idRoot]);
+    let comps = this.getComponents();
+    this.assignChildReferences(comps[this.getIDRoot()]);
 
     /* As the graph loaded ok, signal the scene so that any additional
      initialization depending on the graph can take place
     */
-    Object.keys(this.animations).forEach((key) =>{
-      this.animations[key].initialTime = 0; 
+    let anims = this.getAnimations();
+    Object.keys(anims).forEach((key) =>{
+      anims[key].initialTime = 0; 
     })
 
     this.scene.onGraphLoaded();
@@ -135,8 +166,9 @@ class MySceneGraph {
       if (index != TEXTURES_INDEX) this.onXMLMinorError('tag <textures> out of order');
 
       //Parse textures block
-      this.textures = [];
-      if ((error = textureParser.parseTextures(nodes[index], this.textures, this.scene)) != null) return error;
+      this.ambients[this.selectedAmbient].textures = [];
+      const texs = this.getTextures();
+      if ((error = textureParser.parseTextures(nodes[index], texs, this.scene)) != null) return error;
     }
 
     // <materials>
@@ -145,8 +177,9 @@ class MySceneGraph {
       if (index != MATERIALS_INDEX) this.onXMLMinorError('tag <materials> out of order');
 
       //Parse materials block
-      this.materials = [];
-      if ((error = materialsParser.parseMaterials(nodes[index], this.materials, this)) != null) return error;
+      this.ambients[this.selectedAmbient].materials = [];
+      const materials = this.getMaterials();
+      if ((error = materialsParser.parseMaterials(nodes[index], materials, this)) != null) return error;
     }
 
     // <transformations>
@@ -155,8 +188,9 @@ class MySceneGraph {
       if (index != TRANSFORMATIONS_INDEX) this.onXMLMinorError('tag <transformations> out of order');
 
       //Parse transformations block
-      this.transformations = [];
-      if ((error = transformationParser.parseTransformations(nodes[index], this.transformations, this)) != null)
+      this.ambients[this.selectedAmbient].transformations = [];
+      const transforms = this.getTransformations();
+      if ((error = transformationParser.parseTransformations(nodes[index], transforms, this)) != null)
         return error;
     }
 
@@ -170,15 +204,15 @@ class MySceneGraph {
     
     }
 
-
     // <primitives>
     if ((index = nodeNames.indexOf('primitives')) == -1) return 'tag <primitives> missing';
     else {
       if (index != PRIMITIVES_INDEX) this.onXMLMinorError('tag <primitives> out of order');
 
       //Parse primitives block
-      this.primitives = [];
-      if ((error = primitiveParsers.parsePrimitives(nodes[index], this.primitives, this)) != null) return error;
+      this.ambients[this.selectedAmbient].primitives = [];
+      const prims = this.getPrimitives();
+      if ((error = primitiveParsers.parsePrimitives(nodes[index], prims, this)) != null) return error;
     }
 
     // <components>
@@ -201,13 +235,13 @@ class MySceneGraph {
     var root = parserUtils.reader.getString(sceneNode, 'root');
     if (!root) return 'no root defined for scene';
 
-    this.idRoot = root;
+    this.ambients[this.selectedAmbient].idRoot = root;
 
     // Get axis length
     var axis_length = parserUtils.reader.getFloat(sceneNode, 'axis_length');
     if (axis_length == null) this.onXMLMinorError("no axis_length defined for scene; assuming 'length = 1'");
 
-    this.referenceLength = axis_length || 1;
+    this.ambients[this.selectedAmbient].referenceLength = axis_length || 1;
 
     this.log('Parsed scene');
 
@@ -219,15 +253,16 @@ class MySceneGraph {
    * @param {view block element} viewsNode
    */
   parseView(viewsNode) {
-    this.perspectives = {};
+    this.ambients[this.selectedAmbient].perspectives = {};
     viewsParser.parsePerspectiveViews(viewsNode.getElementsByTagName('perspective'), this);
     viewsParser.parseOrthoViews(viewsNode.getElementsByTagName('ortho'), this);
 
-    if (Object.keys(this.perspectives).length == 0) {
+    const perspectives = this.getPerspectives();
+    if (Object.keys(perspectives).length == 0) {
       return 'No perspectives found!';
     }
 
-    this.scene.views = this.perspectives;
+    this.scene.views = perspectives;
 
     const defaultCamera = parserUtils.reader.getString(viewsNode, 'default');
     if (!defaultCamera) this.onXMLError('default camera not specified');
@@ -244,8 +279,8 @@ class MySceneGraph {
   parseGlobals(ambientsNode) {
     var children = ambientsNode.children;
 
-    this.ambient = [];
-    this.background = [];
+    this.ambients[this.selectedAmbient].ambient = [];
+    this.ambients[this.selectedAmbient].background = [];
 
     var nodeNames = [];
 
@@ -260,11 +295,11 @@ class MySceneGraph {
 
     var color = parserUtils.parseColor(children[ambientIndex], 'ambient');
     if (!Array.isArray(color)) return color;
-    else this.ambient = color;
+    else this.ambients[this.selectedAmbient].ambient = color;
 
     color = parserUtils.parseColor(children[backgroundIndex], 'background');
     if (!Array.isArray(color)) return color;
-    else this.background = color;
+    else this.ambients[this.selectedAmbient].background = color;
 
     this.log('Parsed ambient');
 
@@ -279,7 +314,8 @@ class MySceneGraph {
 
     var children = lightsNode.children;
 
-    this.lights = [];
+    this.ambients[this.selectedAmbient].lights = [];
+    const lights = this.getLights();
     var numLights = 0;
 
     var grandChildren = [];
@@ -306,7 +342,7 @@ class MySceneGraph {
       if (lightId == null) return 'no ID defined for light';
 
       // Checks for repeated IDs.
-      if (this.lights[lightId] != null) return 'ID must be unique for each light (conflict: ID = ' + lightId + ')';
+      if (lights[lightId] != null) return 'ID must be unique for each light (conflict: ID = ' + lightId + ')';
 
       // Light enable/disable
       var aux = parserUtils.reader.getBoolean(children[i], 'enabled');
@@ -370,7 +406,7 @@ class MySceneGraph {
         global.push(...[angle, exponent, targetLight]);
       }
 
-      this.lights[lightId] = global;
+      lights[lightId] = global;
       numLights++;
     }
 
@@ -417,7 +453,7 @@ class MySceneGraph {
   displayScene() {
     if(!this.loadedOk) return;
 
-    const rootComp = this.components[this.idRoot];
+    const rootComp = this.ambients[this.selectedAmbient].components[this.getIDRoot()];
     const rootMat = rootComp.materials[this.materialSwitch % rootComp.materials.length];
     this.displayComponent(rootComp, rootMat, null, 1, 1);
   }
@@ -446,8 +482,9 @@ class MySceneGraph {
     component.children.forEach((child, index) => {
 
       if (typeof child === 'string') {
-        if(!this.components[child]) this.onXMLError(`${child} not found`);
-        component.children[index] = this.components[child];
+        const comps = this.getComponents();
+        if(!comps[child]) this.onXMLError(`${child} not found`);
+        component.children[index] = comps[child];
       }
       this.assignChildReferences(component.children[index]);
     });
@@ -455,8 +492,9 @@ class MySceneGraph {
   }
 
   updateComponentAnimations(currentInstant){
-    Object.keys(this.components).forEach((key) => {
-      const component = this.components[key];
+    const comps = this.getComponents();
+    Object.keys(comps).forEach((key) => {
+      const component = comps[key];
       if(component.animation)
         component.animation.update(currentInstant);
     })
