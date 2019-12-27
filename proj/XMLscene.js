@@ -47,43 +47,6 @@ class XMLscene extends CGFscene {
 
     this.gameOrchestrator = new MyGameOrchestrator(this);
     this.setPickEnabled(true);
-    this.getMoves();
-    this.possibleMoves = [];
-
-
-  }
-
-
-  async getMoves() {
-    const wtResponse = await fetch('http://localhost:8001/move', {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        board: this.boardState,
-        player: 0
-      })
-    });
-
-    const wtmovesJson = await wtResponse.json();
-    this.wtMoves = wtmovesJson.move;
-
-    const blResponse = await fetch('http://localhost:8001/move', {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        board: this.boardState,
-        player: 1
-      })
-    });
-
-    const blmovesJson = await blResponse.json();
-    this.blMoves = blmovesJson.move;
   }
 
   addViews(defaultCamera) {
@@ -250,21 +213,7 @@ class XMLscene extends CGFscene {
 
       // Displays the scene (MySceneGraph function).
       this.graph.displayScene();
-
-      this.pushMatrix();
-      this.translate(5, 0, 0);
-      this.auxBoardWhite.display();
-
-      this.popMatrix();
-
-      this.pushMatrix();
-      this.translate(-5, 0, 0);
-      this.rotate(Math.PI, 0, 1, 0);
-      this.auxBoardBlack.display();
-      this.popMatrix();
-
-      this.board.display();
-      this.possibleMoves.forEach((move) => this.validCell.display(move));
+      this.gameOrchestrator.display();
     }
 
     this.popMatrix();
@@ -273,8 +222,9 @@ class XMLscene extends CGFscene {
 
   logPicking() {
     if (!this.pickMode && this.pickResults
-      && this.pickResults.length > 0 && this.blMoves) {
-      this.possibleMoves.splice(0, this.possibleMoves.length);
+      && this.pickResults.length > 0 && this.gameOrchestrator.blMoves) {
+
+      this.gameOrchestrator.possibleMoves.splice(0, this.gameOrchestrator.possibleMoves.length);
       const validResults = this.pickResults.filter(result => result[0]);
       validResults.forEach(result => {
         result[0](this);

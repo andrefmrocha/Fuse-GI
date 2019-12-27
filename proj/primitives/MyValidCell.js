@@ -2,7 +2,7 @@ class MyValidCell extends CGFobject {
     constructor(scene) {
         super(scene);
 
-        this.torus = new MyTorus(scene, 0.05, 0.45, 20, 20);
+        this.selection = new MyBasedCylinder(scene, 0.2, 0.5, 0.5, 20, 20);
         this.initMaterial();
     }
 
@@ -17,11 +17,6 @@ class MyValidCell extends CGFobject {
         this.validMat.setTextureWrap('REPEAT', 'REPEAT');
     }
 
-    intersects(i,  reachingIndex, move, cell){
-        return (cell == "wt" || cell == "bl") && 
-               ((move > 0 && i <= reachingIndex) || 
-                (move < 0 && i >= reachingIndex));
-    }
 
     display(move) {
         this.scene.pushMatrix();
@@ -29,50 +24,8 @@ class MyValidCell extends CGFobject {
         this.scene.scale(1, 3, 1);
         this.scene.translate(move.move[2] - Math.ceil(move.size_x / 2), 0.2, move.move[3] - Math.ceil(move.size_z / 2));
         this.scene.rotate(Math.PI / 2, 1, 0, 0);
-        this.scene.registerForPick(registerCounter++, (scene) => {
-            const zMove = move.move[3] - move.move[1];
-            const xMove = move.move[2] - move.move[0];
-            const board = scene.boardState;
-            
-            if(xMove == 0){
-                const indexes = [];
-                const reachingIndex = zMove + move.move[1];
-                for(let i = 1; i < board.length - 1; i++){
-                    const cell = board[i][move.move[0]];
-                    if(this.intersects(i, reachingIndex, zMove, cell)){
-                        indexes.push(i);
-                    }
-                }
-
-                indexes.forEach((index, i) => {
-                    const distance = reachingIndex + i + ((zMove > 0) ? i + 1 : -i - 1);
-                    board[distance][move.move[0]] = board[index][move.move[0]];
-                    board[index][move.move[0]] = "empty";
-                });
-                
-            } else {
-                const indexes = [];
-                const row = board[move.move[1]];
-                const reachingIndex = xMove + move.move[0];
-                for (let i = 1; i < row.length - 1; i++) {
-                    const cell = row[i];
-                    if (this.intersects(i, reachingIndex, xMove, cell)) {
-                        indexes.push(i);
-                    }
-                }
-
-                indexes.forEach((index, i) => {
-                    const distance = reachingIndex + ((xMove > 0) ? i + 1: -i -1);
-                    row[distance] = row[index];
-                    row[index] = "empty";
-                })
-            }
-
-            board[move.move[3]][move.move[2]] = board[move.move[1]][move.move[0]];
-            board[move.move[1]][move.move[0]] = "null";
-            scene.getMoves();
-        });
-        this.torus.display();
+        this.scene.gameOrchestrator.registerMovement(move);
+        this.selection.display();
         this.scene.popMatrix();
     }
 }

@@ -5,7 +5,7 @@ class MyGameBoard extends CGFobject {
         this.board = jsonBoard;
         this.rows = jsonBoard.length;
         this.cols = jsonBoard[0].length;
-    
+
         this.boardCell = new MyBoardCell(scene, true);
         this.disc = new MyDisc(scene);
         this.validCell = new MyValidCell(scene);
@@ -13,25 +13,25 @@ class MyGameBoard extends CGFobject {
         this.boardReady = false;
         this.surfaceHeight = 0.5;
     }
-    
-    isInside(row, col){
+
+    isInside(row, col) {
         return row >= 1 && row < this.rows - 1 && col >= 1 && col < this.cols - 1;
     }
 
     display() {
-        const start_z = -this.rows/2 + 0.5;
-        const start_x = -this.cols/2 + 0.5;
+        const start_z = -this.rows / 2 + 0.5;
+        const start_x = -this.cols / 2 + 0.5;
         let i = 1;
         for (let row = 0; row < this.rows; row++) {
             const translate_z = start_z + row;
             for (let col = 0; col < this.cols; col++) {
-            
+
                 // skip board corners
                 const boardCell = this.board[row][col];
-                if(boardCell == "corner") continue;
+                if (boardCell == "corner") continue;
 
                 const translate_x = start_x + col;
-                
+
                 this.scene.pushMatrix();
                 this.scene.translate(translate_x, 0, translate_z);
 
@@ -48,25 +48,15 @@ class MyGameBoard extends CGFobject {
                 this.scene.translate(0, this.surfaceHeight, 0);
 
                 // display disc if it exists
-                if(this.boardReady && boardCell != "empty" && boardCell != "null") {
-                    !this.isInside(row, col) && this.scene.registerForPick(registerCounter++,
-                        (scene) => {
-                            const moves = boardCell == "wt" ? scene.wtMoves : scene.blMoves;
-                            const validMoves = moves.filter(move => move[0] == col && move[1] == row);
-                            validMoves.forEach((move) =>
-                                scene.possibleMoves.push({
-                                    move,
-                                    size_x: scene.boardState[0].length - 2, size_z: scene.boardState.length - 2
-                                }));
-                        }
-                    );
+                if (this.boardReady && boardCell != "empty" && boardCell != "null") {
+                    !this.isInside(row, col) && this.scene.gameOrchestrator.registerDisc(boardCell, col, row);
                     this.disc.setColor(boardCell);
                     this.disc.display();
                     this.scene.clearPickRegistration();
                 }
 
 
-                this.scene.popMatrix(); 
+                this.scene.popMatrix();
                 this.scene.popMatrix();
             }
         }

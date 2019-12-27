@@ -14,8 +14,6 @@
     board_size(columns: integer, rows: integer).
 
 
-:- set_setting(http:cors, [*]).
-
 :-json_object
     coords(xi: integer, yi: integer, xf: integer, yf: integer).
 
@@ -43,22 +41,22 @@
 :-http_handler(root(points), board_points, []).
 
 
+
+build_board(Request):-
+    http_read_json(Request, JSONIn),
+    json_to_prolog(JSONIn, board_size(Columns, Rows)),
+    initialize_empty_board(Rows, Columns, EmptyBoard),
+    initialize_board(EmptyBoard, Board),
+    prolog_to_json(board(Board), JSONOut),
+    cors_enable,
+    reply_json(JSONOut).
+
 build_board(Request) :-
       option(method(options), Request), !,
       cors_enable(Request,
                   [ methods([get,post,delete])
                   ]),
       format('~n'). 
-
-build_board(Request):-
-    cors_enable,
-    http_read_json(Request, JSONIn),
-    cors_enable,
-    json_to_prolog(JSONIn, board_size(Columns, Rows)),
-    initialize_empty_board(Rows, Columns, EmptyBoard),
-    initialize_board(EmptyBoard, Board),
-    prolog_to_json(board(Board), JSONOut),
-    reply_json(JSONOut).
 
 user_move(Request) :-
       option(method(options), Request), !,
