@@ -6,7 +6,7 @@ const componentParser = {
   parseComponents: (componentsNode, sceneGraph) => {
     const children = componentsNode.children;
 
-    sceneGraph.ambients[sceneGraph.selectedAmbient].components = {};
+    sceneGraph.ambients[sceneGraph.newAmbient].components = {};
     const comps = sceneGraph.getComponents();
 
     // Any number of components.
@@ -210,6 +210,6 @@ const componentParser = {
   parseAnimationChildren: (animationsNode, sceneGraph) => {
     const id = parserUtils.reader.getString(animationsNode, 'id');
     if (!id) sceneGraph.onXMLError('No id on animation ref');
-    return sceneGraph.ambients[sceneGraph.selectedAmbient].animations[id];
+    return sceneGraph.ambients[sceneGraph.newAmbient].animations[id];
   }
 }

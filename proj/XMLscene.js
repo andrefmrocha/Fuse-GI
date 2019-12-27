@@ -22,7 +22,7 @@ class XMLscene extends CGFscene {
     this.sceneInited = false;
 
     this.currentView;
-    this.securityView;
+    //this.securityView;
     this.initCameras();
 
     this.enableTextures(true);
@@ -46,17 +46,31 @@ class XMLscene extends CGFscene {
 
   }
 
+  resetGUI() {
+    if (!this.sceneInited) return;
+
+    this.interface.gui.remove(this.currentViewGUI);
+    this.interface.gui.remove(this.ambientViewGUI);
+
+    this.lightsGUI = {};
+    Object.keys(this.lightsGUI).forEach((k,i) => {
+      this.interface.gui.remove(this.lightsGUI[k]);
+    });
+  }
+
   addViews(defaultCamera) {
     this.currentView = defaultCamera ? defaultCamera : Object.keys(this.views)[0];
-    this.securityView = this.currentView;
-    this.interface.gui
+    this.currentViewGUI = this.interface.gui
       .add(this, 'currentView', Object.keys(this.views))
       .name('Scene View')
       .onChange(this.onSelectedView.bind(this));
-    this.interface.gui
-      .add(this, 'securityView', Object.keys(this.views))
-      .name('Security Camera')
-      .onChange(this.onSelectedView.bind(this));
+  }
+
+  addAmbients() {
+    this.ambientViewGUI = this.interface.gui
+      .add(this.graph, 'newAmbient', Object.keys(this.graph.ambients))
+      .name('Selected Ambient')
+      .onChange(this.graph.onSelectedAmbient.bind(this.graph));
   }
 
   onSelectedView() {
@@ -78,8 +92,8 @@ class XMLscene extends CGFscene {
    */
   initLights() {
     // Reads the lights from the scene graph.
-    this.lightsState={};
-    const lights = this.graph.getLights();
+    this.lightsState = {};
+    const lights = this.graph.ambients[this.graph.selectedAmbient].lights
     Object.keys(lights).forEach((key, index) => {
       if (index < 8) { // Only eight lights allowed by WebGL.
         const light = lights[key];
@@ -116,8 +130,9 @@ class XMLscene extends CGFscene {
   }
 
   addLightsToInterface(){
-    Object.keys(this.lightsState).forEach(key => {
-      this.interface.gui.add(this.lightsState[key], 'isEnabled').name(key);
+    this.lightsGUI = {};
+    Object.keys(this.lightsState).forEach((key,i) => {
+      this.lightsGUI[i] = this.interface.gui.add(this.lightsState[key], 'isEnabled').name(key);
     });
   }
 

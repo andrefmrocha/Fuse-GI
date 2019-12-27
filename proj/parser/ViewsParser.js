@@ -23,7 +23,7 @@ const viewsParser = {
         }
       }
       if (from === errorMessage || to === errorMessage) sceneGraph.onXMLError(errorMessage);
-      else sceneGraph.ambients[sceneGraph.selectedAmbient].perspectives[id] = new CGFcamera(angle, near, far, from, to);
+      else sceneGraph.ambients[sceneGraph.newAmbient].perspectives[id] = new CGFcamera(angle, near, far, from, to);
     }
   },
 
@@ -57,7 +57,7 @@ const viewsParser = {
       }
       up = up ? up : [0, 1, 0];
       if (from === errorMessage || to === errorMessage || up === errorMessage) sceneGraph.onXMLError(errorMessage);
-      else sceneGraph.ambients[sceneGraph.selectedAmbient].perspectives[id] = new CGFcameraOrtho(left, right, bottom, top, near, far, from, to, up);
+      else sceneGraph.ambients[sceneGraph.newAmbient].perspectives[id] = new CGFcameraOrtho(left, right, bottom, top, near, far, from, to, up);
     }
   }
 };

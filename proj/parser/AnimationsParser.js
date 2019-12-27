@@ -6,7 +6,7 @@
      */
     parseAnimations: (animationsNode, sceneGraph) => {
         const children = animationsNode.children;
-        sceneGraph.ambients[sceneGraph.selectedAmbient].animations = {};
+        sceneGraph.ambients[sceneGraph.newAmbient].animations = {};
         const graphAnims = sceneGraph.getAnimations();
 
         for (let i = 0; i < children.length; i++) {
