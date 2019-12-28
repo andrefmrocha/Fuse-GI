@@ -97,7 +97,9 @@ serialInclude([
 
     const ambients = [
       'space.xml',
-      'T6_G05.xml'
+      'T6_G05.xml',
+      'T6_G07.xml',
+      'demo.xml'
     ];
 
     // create and load graph, and associate it to scene.
