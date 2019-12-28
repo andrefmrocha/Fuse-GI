@@ -1,9 +1,15 @@
 const PLAYER_1 = "wt";
+const HUMAN = "human";
+const BOT = "robot";
 const PLAYER_2 = "bl";
 
 class MyGameOrchestrator extends CGFobject {
-    constructor(scene) {
+    constructor(scene, player1, player2) {
         super(scene);
+
+        this.playerInfo = {}
+        this.playerInfo[PLAYER_1] = player1;
+        this.playerInfo[PLAYER_2] = player2;
 
         const serverURL = "http://localhost:8001";
         this.generateURL = serverURL + "/generate";
@@ -20,6 +26,7 @@ class MyGameOrchestrator extends CGFobject {
         this.piecesInBoard = false;
         this.initGame();
 
+        
         this.auxBoardWhite = new MyAuxBoard(scene, 0, "wt");
         this.auxBoardBlack = new MyAuxBoard(scene, 0, "bl");
         this.board = new MyGameBoard(scene, [[]]);
@@ -28,7 +35,7 @@ class MyGameOrchestrator extends CGFobject {
     }
 
 
-    async getMoves() {
+    getMoves() {
         if(!this.currentPlayer)
             this.currentPlayer = PLAYER_1;
         else if (this.currentPlayer == PLAYER_1)
@@ -37,6 +44,13 @@ class MyGameOrchestrator extends CGFobject {
             this.currentPlayer = PLAYER_1;
         
         ScoreBoard.displayInfo(this.currentPlayer, this.playerPointsURL, this.boardState);
+        if(this.playerInfo[this.currentPlayer].type == HUMAN)
+            this.getPlayerMoves();
+        else 
+            this.getBotMove();
+    }
+
+    async getPlayerMoves(){
         const wtResponse = await postRequest(this.userMoveURL, {
             board: this.boardState,
             player: 0
@@ -52,6 +66,19 @@ class MyGameOrchestrator extends CGFobject {
 
         const blmovesJson = await blResponse.json();
         this.blMoves = blmovesJson.move;
+
+    }
+
+    async getBotMove(){
+        const response = await postRequest(this.botMoveURL, {
+            board: this.boardState,
+            player: this.currentPlayer == PLAYER_1 ? 0 : 1,
+            difficulty: this.playerInfo[this.currentPlayer].difficulty
+        })
+
+        const movement = await response.json();
+
+        this.moveBoard([movement.xi, movement.yi, movement.xf, movement.yf]);
     }
 
     async initGame() {
@@ -136,7 +163,7 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     registerDisc(boardCell, col, row){
-        this.currentPlayer == boardCell 
+        this.currentPlayer == HUMAN && this.currentPlayer == boardCell
         && this.scene.registerForPick(registerCounter++,
             () => {
                 const moves = boardCell == "wt" ? this.wtMoves :
@@ -179,38 +206,42 @@ class MyGameOrchestrator extends CGFobject {
         }
     }
 
+    moveBoard(move){
+        const zMove = move[3] - move[1];
+        const xMove = move[2] - move[0];
+        const board = this.boardState;
+
+        if (xMove == 0) {
+            const indexes = [];
+            const reachingIndex = zMove + move[1];
+            this.checkIntersections(indexes, (i) => board[i][move[0]], zMove, board.length, reachingIndex);
+
+            indexes.forEach((index, i) => {
+                const distance = reachingIndex + (indexes.length - i) * ((zMove > 0) ? 1 : -1);
+                board[distance][move[0]] = board[index][move[0]];
+                board[index][move[0]] = "empty";
+            });
+
+        } else {
+            const indexes = [];
+            const row = board[move[1]];
+            const reachingIndex = xMove + move[0];
+            this.checkIntersections(indexes, (i) => row[i], xMove, row.length, reachingIndex);
+            indexes.forEach((index, i) => {
+                const distance = reachingIndex + (indexes.length - i) * ((xMove > 0) ? 1 : -1);
+                row[distance] = row[index];
+                row[index] = "empty";
+            })
+        }
+
+        board[move[3]][move[2]] = board[move[1]][move[0]];
+        board[move[1]][move[0]] = "null";
+        this.getMoves();
+    }
+
     registerMovement(move){
         this.scene.registerForPick(registerCounter++, () => {
-            const zMove = move.move[3] - move.move[1];
-            const xMove = move.move[2] - move.move[0];
-            const board = this.boardState;
-
-            if (xMove == 0) {
-                const indexes = [];
-                const reachingIndex = zMove + move.move[1];
-                this.checkIntersections(indexes, (i) => board[i][move.move[0]], zMove, board.length, reachingIndex);
-
-                indexes.forEach((index, i) => {
-                    const distance = reachingIndex + (indexes.length - i) * ((zMove > 0) ? 1: -1);
-                    board[distance][move.move[0]] = board[index][move.move[0]];
-                    board[index][move.move[0]] = "empty";
-                });
-
-            } else {
-                const indexes = [];
-                const row = board[move.move[1]];
-                const reachingIndex = xMove + move.move[0];
-                this.checkIntersections(indexes, (i) => row[i], xMove, row.length, reachingIndex);
-                indexes.forEach((index, i) => {
-                    const distance = reachingIndex + (indexes.length - i) * ((xMove > 0) ? 1 : -1);
-                    row[distance] = row[index];
-                    row[index] = "empty";
-                })
-            }
-
-            board[move.move[3]][move.move[2]] = board[move.move[1]][move.move[0]];
-            board[move.move[1]][move.move[0]] = "null";
-            this.getMoves();
+            this.moveBoard(move.move);
         });
     }
 

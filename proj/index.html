@@ -19,7 +19,8 @@
         height: 100%;
       }
 
-      #panel{
+      #panel {
+        display: none;
         margin: 2em 0 0 2em;
         position: absolute;
         width: 20vw;
@@ -28,28 +29,97 @@
         background-color: rgba(0, 0, 0, 0.5);
       }
 
-      #panel > h1 ,
-      #panel > div{
+      #panel > h1,
+      #panel > div {
         text-align: center;
+      }
+
+      #menu {
+        display: flex;
+        flex-wrap: wrap;
+        margin: auto;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+      }
+
+      #menu article {
+        flex-basis: 50%;
+      }
+
+      #menu article * {
+        width: fit-content;
+        margin: auto;
+      }
+
+      #menu article select {
+        display: none;
+      }
+
+      #menu > div {
+        flex-basis: 100%;
+      }
+      #menu > div > input {
+        display: block;
+        margin: auto;
       }
     </style>
   </head>
   <body>
     <script src="main.js"></script>
-      <div id="panel">
-        <h1>FUSE</h1>
-        <div>
-          Player: <span id="player">None</span>
-        </div>
-        <div>
-          White Score: <span id="white-score">0</span>
-        </div>
-        <div>
-          Black Score: <span id="black-score">0</span>
-        </div>
-        <div>
-          <span id="time"></span> <!--For later purpose-->
-        </div>
+    <div id="panel">
+      <h1>FUSE</h1>
+      <div>Player: <span id="player">None</span></div>
+      <div>White Score: <span id="white-score">0</span></div>
+      <div>Black Score: <span id="black-score">0</span></div>
+      <div>
+        <span id="time"></span>
+        <!--For later purpose-->
       </div>
+    </div>
+    <div id="menu">
+      <article id="player-1">
+        <div>
+          <label>
+            Player
+            <input type="radio" name="player-1" value="human" />
+          </label>
+          <label>
+            Robot
+            <input type="radio" name="player-1" value="robot" />
+          </label>
+        </div>
+        <select name="difficulty">
+          <option value="0">Very Easy</option>
+          <option value="1">Easy</option>
+          <option value="2">Normal</option>
+          <option value="3">Hard</option>
+          <option value="4">Very Hard</option>
+        </select>
+      </article>
+      <article id="player-2">
+        <div>
+          <label>
+            Player
+            <input type="radio" name="player-2" value="human" >
+          </label>
+          <label>
+            Robot
+            <input type="radio" name="player-2" value="robot" >
+          </label>
+        </div>
+        <select name="difficulty">
+          <option value="0">Very Easy</option>
+          <option value="1">Easy</option>
+          <option value="2">Normal</option>
+          <option value="3">Hard</option>
+          <option value="4">Very Hard</option>
+        </select>
+      </article>
+      <div>
+        <input type="submit" value="Play" >
+      </div>
+    </div>
   </body>
 </html>
