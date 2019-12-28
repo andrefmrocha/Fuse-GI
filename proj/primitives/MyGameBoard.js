@@ -49,7 +49,11 @@ class MyGameBoard extends CGFobject {
 
                 // display disc if it exists
                 if (this.boardReady && boardCell != "empty" && boardCell != "null") {
-                    !this.isInside(row, col) && this.scene.gameOrchestrator.registerDisc(boardCell, col, row);
+                    if (!this.isInside(row, col))
+                      this.scene.gameOrchestrator.registerDisc(boardCell, col, row);
+                    else {
+                        this.scene.gameOrchestrator.discAsValidMove(col, row);
+                    }
                     this.disc.setColor(boardCell);
                     this.disc.display();
                     this.scene.clearPickRegistration();

@@ -136,7 +136,8 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     registerDisc(boardCell, col, row){
-        this.scene.registerForPick(registerCounter++,
+        this.currentPlayer == boardCell 
+        && this.scene.registerForPick(registerCounter++,
             () => {
                 const moves = boardCell == "wt" ? this.wtMoves :
                     this.blMoves;
@@ -158,6 +159,26 @@ class MyGameOrchestrator extends CGFobject {
                 (move < 0 && i >= reachingIndex));
     }
 
+    checkIntersections(indexes, getCell, move, length, reachingIndex){
+        if(move > 0){
+            for (let i = 1; i < length - 1; i++) {
+                const cell = getCell(i);
+                if (this.intersects(i, reachingIndex + indexes.length, move, cell)) {
+                    indexes.push(i);
+                }
+                indexes.sort((a, b) => b - a)
+            }
+        } else {
+            for (let i = length - 2; i >= 1; i--) {
+                const cell = getCell(i);
+                if (this.intersects(i, reachingIndex - indexes.length, move, cell)) {
+                    indexes.push(i);
+                }
+            }
+            indexes.sort((a, b) => a - b);
+        }
+    }
+
     registerMovement(move){
         this.scene.registerForPick(registerCounter++, () => {
             const zMove = move.move[3] - move.move[1];
@@ -167,15 +188,10 @@ class MyGameOrchestrator extends CGFobject {
             if (xMove == 0) {
                 const indexes = [];
                 const reachingIndex = zMove + move.move[1];
-                for (let i = 1; i < board.length - 1; i++) {
-                    const cell = board[i][move.move[0]];
-                    if (this.intersects(i, reachingIndex, zMove, cell)) {
-                        indexes.push(i);
-                    }
-                }
+                this.checkIntersections(indexes, (i) => board[i][move.move[0]], zMove, board.length, reachingIndex);
 
                 indexes.forEach((index, i) => {
-                    const distance = reachingIndex + ((zMove > 0) ? i + 1 : -i - 1);
+                    const distance = reachingIndex + (indexes.length - i) * ((zMove > 0) ? 1: -1);
                     board[distance][move.move[0]] = board[index][move.move[0]];
                     board[index][move.move[0]] = "empty";
                 });
@@ -184,15 +200,9 @@ class MyGameOrchestrator extends CGFobject {
                 const indexes = [];
                 const row = board[move.move[1]];
                 const reachingIndex = xMove + move.move[0];
-                for (let i = 1; i < row.length - 1; i++) {
-                    const cell = row[i];
-                    if (this.intersects(i, reachingIndex, xMove, cell)) {
-                        indexes.push(i);
-                    }
-                }
-
+                this.checkIntersections(indexes, (i) => row[i], xMove, row.length, reachingIndex);
                 indexes.forEach((index, i) => {
-                    const distance = reachingIndex + ((xMove > 0) ? i + 1 : -i - 1);
+                    const distance = reachingIndex + (indexes.length - i) * ((xMove > 0) ? 1 : -1);
                     row[distance] = row[index];
                     row[index] = "empty";
                 })
@@ -202,6 +212,13 @@ class MyGameOrchestrator extends CGFobject {
             board[move.move[1]][move.move[0]] = "null";
             this.getMoves();
         });
+    }
+
+    discAsValidMove(col, row){
+        const discMove = this.possibleMoves.find((move) => move.move[2] == col && move.move[3] == row);
+        if(discMove){
+            this.registerMovement(discMove);
+        }
     }
     
 }
