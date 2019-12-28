@@ -163,7 +163,7 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     registerDisc(boardCell, col, row){
-        this.currentPlayer == HUMAN && this.currentPlayer == boardCell
+        this.playerInfo[this.currentPlayer].type == HUMAN && this.currentPlayer == boardCell
         && this.scene.registerForPick(registerCounter++,
             () => {
                 const moves = boardCell == "wt" ? this.wtMoves :
