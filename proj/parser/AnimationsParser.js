@@ -6,7 +6,8 @@
      */
     parseAnimations: (animationsNode, sceneGraph) => {
         const children = animationsNode.children;
-        sceneGraph.animations = {};
+        sceneGraph.ambients[sceneGraph.newAmbient].animations = {};
+        const graphAnims = sceneGraph.getAnimations();
 
         for (let i = 0; i < children.length; i++) {
             if (children[i].nodeName != 'animation') {
@@ -21,11 +22,11 @@
             if (!animationID) return 'no ID defined for animation!';
 
 
-            if (sceneGraph.animations[animationID])
+            if (graphAnims[animationID])
                 return `ID must be unique for each animation (conflict: ID =  ${animationID})`;
 
             const keyframes = animationsParser.parseKeyframes(children[i], sceneGraph, animationID);
-            sceneGraph.animations[animationID] = new KeyframeAnimation(sceneGraph.scene, keyframes, isLoop);
+            graphAnims[animationID] = new KeyframeAnimation(sceneGraph.scene, keyframes, isLoop);
         }
     },
 
