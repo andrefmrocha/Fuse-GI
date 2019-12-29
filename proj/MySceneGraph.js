@@ -70,7 +70,7 @@ class MySceneGraph {
         anims[key].initialTime = 0; 
       });
   
-      this.selectedAmbient = this.newAmbient;
+      this.selectedAmbient = parseInt(this.newAmbient);
       this.scene.resetGUI();
       
       this.scene.views = this.ambients[this.selectedAmbient].perspectives;
@@ -120,7 +120,7 @@ class MySceneGraph {
       anims[key].initialTime = 0; 
     });
 
-    this.selectedAmbient = this.newAmbient;
+    this.selectedAmbient = parseInt(this.newAmbient);
 
     this.scene.onGraphLoaded();
   }

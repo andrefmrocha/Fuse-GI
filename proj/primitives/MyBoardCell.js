@@ -4,38 +4,63 @@ class MyBoardCell extends CGFobject {
         this.isInner = isInner != null ? isInner : true;
 
         this.rectangle = new MyRectangle(scene, -0.5, 0.5, -0.5, 0.5);
-        this.initMaterial();
+
+        this.initTextures();
+        this.initMaterials();
     }
 
-    initMaterial() {
+    initTextures() {
         const imgPath = '/proj/scenes/images/';
-        this.innerCellTop = new CGFappearance(this.scene);
-        this.innerCellTop.setAmbient(0.6, 0.6, 0.6, 1);
-        this.innerCellTop.setDiffuse(0.8, 0.8, 0.8, 1);
-        this.innerCellTop.setSpecular(0.3, 0.3, 0.3, 1);
-        this.innerCellTop.setShininess(10.0);
-        this.innerCellTop.loadTexture(imgPath + 'board_cell.jpg');
-        this.innerCellTop.setTextureWrap('REPEAT', 'REPEAT');
-
-        this.outerCellTop = new CGFappearance(this.scene);
-        this.outerCellTop.setAmbient(0.6, 0.6, 0.6, 1);
-        this.outerCellTop.setDiffuse(0.8, 0.8, 0.8, 1);
-        this.outerCellTop.setSpecular(0.3, 0.3, 0.3, 1);
-        this.outerCellTop.setShininess(10.0);
-        this.outerCellTop.loadTexture(imgPath + 'outer_board_cell.jpg');
-        this.outerCellTop.setTextureWrap('REPEAT', 'REPEAT');
+        this.cellBase = new CGFtexture(this.scene, imgPath + 'board_wood.jpg');
+        this.innerCellTop = new CGFtexture(this.scene, imgPath + 'board_cell.jpg');
+        this.outerCellTop = new CGFtexture(this.scene, imgPath + 'outer_board_cell.jpg');
         
-        this.cellBase = new CGFappearance(this.scene);
-        this.cellBase.setAmbient(0.6, 0.6, 0.6, 1);
-        this.cellBase.setDiffuse(0.8, 0.8, 0.8, 1);
-        this.cellBase.setSpecular(0.3, 0.3, 0.3, 1);
-        this.cellBase.setShininess(10.0);
-        this.cellBase.loadTexture(imgPath + 'board_wood.jpg');
-        this.cellBase.setTextureWrap('REPEAT', 'REPEAT');
+        this.vortex = new CGFtexture(this.scene, imgPath + 'vortex.jpg');
+        this.space = new CGFtexture(this.scene, imgPath + 'starfield.jpg');
+        this.space_border = new CGFtexture(this.scene, imgPath + 'starfield_border.jpg');
+    
+        this.pipe_top = new CGFtexture(this.scene, imgPath + 'pipe_top.jpg');
+        this.pipe_side = new CGFtexture(this.scene, imgPath + 'pipe_side.jpg');
+        this.mario_brick = new CGFtexture(this.scene, imgPath + 'mario_brick.jpg');
+    
+        this.tree_trunk = new CGFtexture(this.scene, imgPath + 'tree_trunk.jpg');
+        this.tree_leaves = new CGFtexture(this.scene, imgPath + 'tree_leaves.jpg');
+        this.grass = new CGFtexture(this.scene, imgPath + 'grass.jpg');
+
+    }
+
+    initMaterials() {
+        this.mat = new CGFappearance(this.scene);
+        this.mat.setAmbient(0.6, 0.6, 0.6, 1);
+        this.mat.setDiffuse(0.8, 0.8, 0.8, 1);
+        this.mat.setSpecular(0.3, 0.3, 0.3, 1);
+        this.mat.setShininess(10.0);
+        this.mat.setTextureWrap('REPEAT', 'REPEAT');
     }
 
     display() {
-        this.cellBase.apply();
+        const currentAmbient = this.scene.graph.selectedAmbient;
+        switch(currentAmbient) {
+            // space
+            case 0:
+                this.mat.setTexture(this.space);
+                break;
+
+            // zelda + up
+            case 1:
+                this.mat.setTexture(this.tree_trunk);
+                break;
+
+            // super mario
+            case 2:
+                this.mat.setTexture(this.pipe_side);
+                break;
+            
+            default:
+                this.mat.setTexture(this.cellBase);
+                break;
+        }
+        this.mat.apply();
 
         // front
         this.scene.pushMatrix();
@@ -71,9 +96,31 @@ class MyBoardCell extends CGFobject {
         this.rectangle.display();
         this.scene.popMatrix();
 
-        // apply correct material
-        if (this.isInner) this.innerCellTop.apply();
-        else this.outerCellTop.apply();
+        switch(currentAmbient) {
+            // space
+            case 0:
+                if (this.isInner) this.mat.setTexture(this.space_border);
+                else this.mat.setTexture(this.vortex);
+                break;
+
+            // zelda + up
+            case 1:
+                if (this.isInner) this.mat.setTexture(this.grass);
+                else this.mat.setTexture(this.tree_leaves);
+                break;
+
+            // super mario
+            case 2:
+                if (this.isInner) this.mat.setTexture(this.mario_brick);
+                else this.mat.setTexture(this.pipe_top);
+                break;
+            
+            default:
+                if (this.isInner) this.mat.setTexture(this.innerCellTop);
+                else this.mat.setTexture(this.outerCellTop);
+                break;
+        }
+        this.mat.apply();
         
         // top
         this.scene.pushMatrix();

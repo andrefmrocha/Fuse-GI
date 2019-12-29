@@ -9,7 +9,7 @@ class MyAuxBoard extends CGFobject {
         this.centerPos = centerPos;
     
         this.boardCell = new MyBoardCell(scene, false);
-        this.disc = new MyDisc(scene, color);
+        this.playerPiece = new MyPlayerPiece(scene, color);
 
         // Start animation variables
         this.startAnimationDuration = 3;
@@ -39,7 +39,7 @@ class MyAuxBoard extends CGFobject {
     }
 
     startAnimationFinished() {
-        return this.startAnimationFinished == true;
+        return this.finishedStartAnimation == true;
     }
 
     setGameStarted(val) {
@@ -150,8 +150,8 @@ class MyAuxBoard extends CGFobject {
                 this.scene.popMatrix();
 
                 // height of board surface
-                if (added_pieces < this.nPieces) {
-
+                if (!this.gameStarted && added_pieces < this.nPieces) {
+                    // console.log("Meias");
                     this.scene.pushMatrix();
 
                     // object animation transformations
@@ -168,7 +168,7 @@ class MyAuxBoard extends CGFobject {
 
                     this.scene.scale(...anim_scale);
 
-                    this.disc.display();
+                    this.playerPiece.display();
                     this.scene.popMatrix();
                     added_pieces++;
                 }
