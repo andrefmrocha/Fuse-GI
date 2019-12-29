@@ -78,6 +78,8 @@ serialInclude([
   'animation/KeyframeAnimation.js',
   'MySecurityCamera.js',
   'MyGameOrchestrator.js',
+  'cgfobjreader/CGFOBJModel.js',
+  'cgfobjreader/CGFResourceReader.js',
 
   (main = function() {
     // Standard application, scene and interface setup

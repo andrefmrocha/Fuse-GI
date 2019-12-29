@@ -1,6 +1,7 @@
 class MyGameOrchestrator extends CGFobject {
     constructor(scene) {
         super(scene);
+        scene.orchestrator = this;
 
         const serverURL = "http://localhost:8001";
         this.generateURL = serverURL + "/generate";

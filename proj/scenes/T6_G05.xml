@@ -3,7 +3,7 @@
 
     <views default="Full View">
         <perspective id="Full View" near="5" far="5000" angle="60">
-            <from x="0" y="15" z="20" />
+            <from x="0" y="8" z="12" />
             <to x="0" y="0" z="0" />
         </perspective>
     </views>

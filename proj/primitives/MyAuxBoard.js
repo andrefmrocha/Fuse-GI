@@ -39,7 +39,7 @@ class MyAuxBoard extends CGFobject {
     }
 
     startAnimationFinished() {
-        return this.startAnimationFinished == true;
+        return this.finishedStartAnimation == true;
     }
 
     setGameStarted(val) {
