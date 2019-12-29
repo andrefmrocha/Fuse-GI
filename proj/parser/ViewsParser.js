@@ -23,7 +23,7 @@ const viewsParser = {
         }
       }
       if (from === errorMessage || to === errorMessage) sceneGraph.onXMLError(errorMessage);
-      else sceneGraph.ambients[sceneGraph.newAmbient].perspectives[id] = new CGFcamera(angle, near, far, from, to);
+      else sceneGraph.ambients[sceneGraph.newAmbient].perspectives[id] = {fov: angle, near, far, position: from, target: to} ;
     }
   },
 

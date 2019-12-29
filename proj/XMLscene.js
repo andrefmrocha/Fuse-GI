@@ -78,9 +78,10 @@ class XMLscene extends CGFscene {
   }
 
   onSelectedView() {
-    this.sceneCamera = this.views[this.currentView];
+    this.gameOrchestrator.cameraChange(this.currentTime, this.sceneCamera, this.views[this.currentView]);
+    // this.sceneCamera = new CGFcamera(...Object.values(this.views[this.currentView]));
+    // this.interface.setActiveCamera(new CG);
     //this.secondaryCamera = this.views[this.securityView];
-    this.interface.setActiveCamera(this.sceneCamera);
   }
 
   /**
@@ -189,6 +190,7 @@ class XMLscene extends CGFscene {
   }
 
   update(currTime) {
+    this.currentTime = currTime;
     if (this.sceneInited) {
       const currentInstant = currTime - this.time;
       this.graph.updateComponentAnimations(currentInstant);

@@ -2,6 +2,7 @@ const PLAYER_1 = "wt";
 const HUMAN = "human";
 const BOT = "robot";
 const PLAYER_2 = "bl";
+const CAMERA_ANIMATION_TIME = 3;
 
 class MyGameOrchestrator extends CGFobject {
     constructor(scene, player1, player2) {
@@ -27,17 +28,18 @@ class MyGameOrchestrator extends CGFobject {
         this.piecesInBoard = false;
         this.initGame();
 
-        
+
         this.auxBoardWhite = new MyAuxBoard(scene, 0, "wt");
         this.auxBoardBlack = new MyAuxBoard(scene, 0, "bl");
         this.board = new MyGameBoard(scene, [[]]);
         this.possibleMoves = [];
         this.validCell = new MyValidCell(scene);
         this.moves = [];
+        this.animations = [];
     }
 
-    switchPlayers(){
-        switch(this.currentPlayer){
+    switchPlayers() {
+        switch (this.currentPlayer) {
             case PLAYER_1:
                 this.currentPlayer = PLAYER_2;
                 break;
@@ -54,13 +56,13 @@ class MyGameOrchestrator extends CGFobject {
 
     getMoves() {
         this.switchPlayers();
-        if(this.playerInfo[this.currentPlayer].type == HUMAN)
+        if (this.playerInfo[this.currentPlayer].type == HUMAN)
             this.getPlayerMoves();
-        else 
+        else
             this.getBotMove();
     }
 
-    async getPlayerMoves(){
+    async getPlayerMoves() {
         const wtResponse = await postRequest(this.userMoveURL, {
             board: this.boardState,
             player: 0
@@ -79,7 +81,7 @@ class MyGameOrchestrator extends CGFobject {
 
     }
 
-    async getBotMove(){
+    async getBotMove() {
         const response = await postRequest(this.botMoveURL, {
             board: this.boardState,
             player: this.currentPlayer == PLAYER_1 ? 0 : 1,
@@ -92,7 +94,7 @@ class MyGameOrchestrator extends CGFobject {
         this.moveBoard(move, this.boardState);
         this.getMoves();
 
-        this.moves.push({move, type: BOT});
+        this.moves.push({ move, type: BOT });
     }
 
     async initGame() {
@@ -109,10 +111,10 @@ class MyGameOrchestrator extends CGFobject {
         this.getMoves();
         this.board = new MyGameBoard(this.scene, this.boardState);
 
-        const piecesPositions = this.determinePiecesInitialPositions(boardJson.board); 
-        this.auxBoardWhite = 
+        const piecesPositions = this.determinePiecesInitialPositions(boardJson.board);
+        this.auxBoardWhite =
             new MyAuxBoard(this.scene, piecesPositions["wt"].length, "wt", this.whiteBoardPos, piecesPositions);
-        this.auxBoardBlack = 
+        this.auxBoardBlack =
             new MyAuxBoard(this.scene, piecesPositions["bl"].length, "bl", this.blackBoardPos, piecesPositions, true);
 
         this.gameReady = true;
@@ -120,17 +122,17 @@ class MyGameOrchestrator extends CGFobject {
 
     determinePiecesInitialPositions(board) {
         let piecesPositions = {
-            "wt" : [],
-            "bl" : [],
-            "empty" : [],
-            "corner" : []
+            "wt": [],
+            "bl": [],
+            "empty": [],
+            "corner": []
         };
 
         // determine pieces final positions for animation
         const rows = board.length;
         const cols = board[0].length;
-        const start_z = -rows/2 + 0.5;
-        const start_x = -cols/2 + 0.5;
+        const start_z = -rows / 2 + 0.5;
+        const start_x = -cols / 2 + 0.5;
         for (let row = 0; row < rows; row++) {
             const translate_z = start_z + row;
             for (let col = 0; col < cols; col++) {
@@ -158,13 +160,15 @@ class MyGameOrchestrator extends CGFobject {
                 this.board.setBoardReady(true);
             }
         }
+
+        this.animations.forEach(animation => animation.update(time));
     }
 
     display() {
         if (!this.gameReady) return;
 
         this.board.display();
-      
+
         this.scene.pushMatrix();
         this.scene.translate(...this.whiteBoardPos);
         this.auxBoardWhite.display();
@@ -177,21 +181,21 @@ class MyGameOrchestrator extends CGFobject {
         this.possibleMoves.forEach((move) => this.validCell.display(move));
     }
 
-    registerDisc(boardCell, col, row){
+    registerDisc(boardCell, col, row) {
         this.playerInfo[this.currentPlayer].type == HUMAN && this.currentPlayer == boardCell
-        && this.scene.registerForPick(registerCounter++,
-            () => {
-                const moves = boardCell == "wt" ? this.wtMoves :
-                    this.blMoves;
-                const validMoves = moves.filter(move => move[0] == col && move[1] == row);
-                validMoves.forEach((move) =>
-                    this.possibleMoves.push({
-                        move,
-                        size_x: this.boardState[0].length - 2,
-                        size_z: this.boardState.length - 2
-                    }));
-            }
-        );
+            && this.scene.registerForPick(registerCounter++,
+                () => {
+                    const moves = boardCell == "wt" ? this.wtMoves :
+                        this.blMoves;
+                    const validMoves = moves.filter(move => move[0] == col && move[1] == row);
+                    validMoves.forEach((move) =>
+                        this.possibleMoves.push({
+                            move,
+                            size_x: this.boardState[0].length - 2,
+                            size_z: this.boardState.length - 2
+                        }));
+                }
+            );
     }
 
 
@@ -201,8 +205,8 @@ class MyGameOrchestrator extends CGFobject {
                 (move < 0 && i >= reachingIndex));
     }
 
-    checkIntersections(indexes, getCell, move, length, reachingIndex){
-        if(move > 0){
+    checkIntersections(indexes, getCell, move, length, reachingIndex) {
+        if (move > 0) {
             for (let i = 1; i < length - 1; i++) {
                 const cell = getCell(i);
                 if (this.intersects(i, reachingIndex + indexes.length, move, cell)) {
@@ -221,7 +225,7 @@ class MyGameOrchestrator extends CGFobject {
         }
     }
 
-    moveBoard(move, board){
+    moveBoard(move, board) {
         const zMove = move[3] - move[1];
         const xMove = move[2] - move[0];
 
@@ -252,24 +256,24 @@ class MyGameOrchestrator extends CGFobject {
         board[move[1]][move[0]] = "null";
     }
 
-    registerMovement(move){
+    registerMovement(move) {
         this.scene.registerForPick(registerCounter++, () => {
             this.moveBoard(move.move, this.boardState);
             this.getMoves();
-            this.moves.push({...move, type: HUMAN});
+            this.moves.push({ ...move, type: HUMAN });
         });
     }
 
-    discAsValidMove(col, row){
+    discAsValidMove(col, row) {
         const discMove = this.possibleMoves.find((move) => move.move[2] == col && move.move[3] == row);
-        if(discMove){
+        if (discMove) {
             this.registerMovement(discMove);
         }
     }
 
     undo() {
-        if(this.moves.length == 0) return;
-        if(this.moves[this.moves.length - 1].type == BOT){
+        if (this.moves.length == 0) return;
+        if (this.moves[this.moves.length - 1].type == BOT) {
             this.switchPlayers();
             this.moves.splice(this.moves.length - 1, 1);
         }
@@ -281,9 +285,42 @@ class MyGameOrchestrator extends CGFobject {
         this.boardState = board;
         this.board.board = board;
         this.switchPlayers();
-        this.getPlayerMoves();   
+        this.getPlayerMoves();
     }
-    
+
+    cameraChange(initialTime, initialCamera, finalCamera) {
+        const finalTime = initialTime + 1000 * CAMERA_ANIMATION_TIME;
+
+        const animation = new MyAnimation(
+            (time) => {
+                const timeFactor = 1 - (finalTime - time) / (finalTime - initialTime);
+                if(timeFactor >= 1) return true;
+                const camera = []; 
+                
+                ['fov','near', 'far'].forEach((key) => {
+                    const finalValue = finalCamera[key];
+                    const initialValue = initialCamera[key];
+                    camera.push(((finalValue - initialValue) * timeFactor) + initialValue);
+                });
+                
+                ['position', 'target'].forEach((key) => {
+                    const finalValue = finalCamera[key];
+                    const initialValue = initialCamera[key];
+                    camera.push(finalValue.map((value, index) => 
+                        ((value - initialValue[index]) * timeFactor) + initialValue[index]));
+                });
+
+                this.scene.sceneCamera = new CGFcamera(...camera);
+
+            },
+            () => {
+                this.animations.splice(this.animations.indexOf(animation, 1));
+                this.scene.sceneCamera = new CGFcamera(...Object.keys(finalCamera).map(key => finalCamera[key]));
+            }
+        );
+        this.animations.push(animation);
+    }
+
 }
 
 function postRequest(url, body) {
