@@ -124,13 +124,15 @@ function startGame(player1, player2){
 
   app.init();
 
-    const ambients = [
-      'space.xml',
-      'T6_G05.xml',
-      'T6_G07.xml',
-      'demo.xml'
-    ];
-
+  const ambients = [
+    'space.xml',
+    'T6_G05.xml',
+    'T6_G07.xml',
+    'demo.xml'
+  ];
+  
+  app.setScene(myScene);
+  app.setInterface(myInterface);
   myInterface.setActiveCamera(myScene.camera);
 
     // create and load graph, and associate it to scene.

@@ -24,6 +24,7 @@ class MyInterface extends CGFinterface {
   
     this.initKeys();
 
+    console.log("oi");
 
     return true;
   }
