@@ -33,18 +33,27 @@ class MyGameOrchestrator extends CGFobject {
         this.board = new MyGameBoard(scene, [[]]);
         this.possibleMoves = [];
         this.validCell = new MyValidCell(scene);
+        this.moves = [];
+    }
+
+    switchPlayers(){
+        switch(this.currentPlayer){
+            case PLAYER_1:
+                this.currentPlayer = PLAYER_2;
+                break;
+            case PLAYER_2:
+                this.currentPlayer = PLAYER_1;
+                break;
+            default:
+                this.currentPlayer = PLAYER_1;
+        }
+
+        ScoreBoard.displayInfo(this.currentPlayer, this.playerPointsURL, this.boardState);
     }
 
 
     getMoves() {
-        if(!this.currentPlayer)
-            this.currentPlayer = PLAYER_1;
-        else if (this.currentPlayer == PLAYER_1)
-            this.currentPlayer = PLAYER_2;
-        else 
-            this.currentPlayer = PLAYER_1;
-        
-        ScoreBoard.displayInfo(this.currentPlayer, this.playerPointsURL, this.boardState);
+        this.switchPlayers();
         if(this.playerInfo[this.currentPlayer].type == HUMAN)
             this.getPlayerMoves();
         else 
@@ -79,7 +88,11 @@ class MyGameOrchestrator extends CGFobject {
 
         const movement = await response.json();
 
-        this.moveBoard([movement.xi, movement.yi, movement.xf, movement.yf]);
+        const move = [movement.xi, movement.yi, movement.xf, movement.yf];
+        this.moveBoard(move, this.boardState);
+        this.getMoves();
+
+        this.moves.push({move, type: BOT});
     }
 
     async initGame() {
@@ -92,6 +105,7 @@ class MyGameOrchestrator extends CGFobject {
         const genBoardResponse = await postRequest(this.generateURL, request);
         const boardJson = await genBoardResponse.json();
         this.boardState = boardJson.board;
+        this.initialBoard = this.boardState.map(row => row.slice());
         this.getMoves();
         this.board = new MyGameBoard(this.scene, this.boardState);
 
@@ -207,10 +221,9 @@ class MyGameOrchestrator extends CGFobject {
         }
     }
 
-    moveBoard(move){
+    moveBoard(move, board){
         const zMove = move[3] - move[1];
         const xMove = move[2] - move[0];
-        const board = this.boardState;
 
         if (xMove == 0) {
             const indexes = [];
@@ -237,12 +250,13 @@ class MyGameOrchestrator extends CGFobject {
 
         board[move[3]][move[2]] = board[move[1]][move[0]];
         board[move[1]][move[0]] = "null";
-        this.getMoves();
     }
 
     registerMovement(move){
         this.scene.registerForPick(registerCounter++, () => {
-            this.moveBoard(move.move);
+            this.moveBoard(move.move, this.boardState);
+            this.getMoves();
+            this.moves.push({...move, type: HUMAN});
         });
     }
 
@@ -251,6 +265,23 @@ class MyGameOrchestrator extends CGFobject {
         if(discMove){
             this.registerMovement(discMove);
         }
+    }
+
+    undo() {
+        if(this.moves.length == 0) return;
+        if(this.moves[this.moves.length - 1].type == BOT){
+            this.switchPlayers();
+            this.moves.splice(this.moves.length - 1, 1);
+        }
+
+        this.moves.splice(this.moves.length - 1, 1);
+
+        const board = this.initialBoard.map(row => row.slice());
+        this.moves.forEach((move) => this.moveBoard(move.move, board));
+        this.boardState = board;
+        this.board.board = board;
+        this.switchPlayers();
+        this.getPlayerMoves();   
     }
     
 }
