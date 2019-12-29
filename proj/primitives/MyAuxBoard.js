@@ -150,8 +150,8 @@ class MyAuxBoard extends CGFobject {
                 this.scene.popMatrix();
 
                 // height of board surface
-                if (added_pieces < this.nPieces) {
-
+                if (!this.gameStarted && added_pieces < this.nPieces) {
+                    // console.log("Meias");
                     this.scene.pushMatrix();
 
                     // object animation transformations

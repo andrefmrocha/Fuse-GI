@@ -1,3 +1,6 @@
+let registerCounter = 1;
+
+
 /**
  * XMLscene class, representing the scene that is to be rendered.
  */
@@ -6,10 +9,12 @@ class XMLscene extends CGFscene {
    * @constructor
    * @param {MyInterface} myinterface
    */
-  constructor(myinterface) {
+  constructor(myinterface, player1, player2) {
     super();
 
     this.interface = myinterface;
+    this.player1 = player1;
+    this.player2 = player2;
   }
 
   /**
@@ -33,7 +38,7 @@ class XMLscene extends CGFscene {
     this.gl.depthFunc(this.gl.LEQUAL);
 
     this.axis = new CGFaxis(this);
-    this.setUpdatePeriod(1000/30); // 30 fps
+    this.setUpdatePeriod(1000 / 30); // 30 fps
     this.viewsList = [];
     this.viewsIDs = {};
     this.views = {};
@@ -41,9 +46,8 @@ class XMLscene extends CGFscene {
 
     //this.securityCameraTexture = new CGFtextureRTT(this, this.gl.canvas.width, this.gl.canvas.height);
     //this.securityCamera = new MySecurityCamera(this);
-
-    this.gameOrchestrator = new MyGameOrchestrator(this);
-
+    this.gameOrchestrator = new MyGameOrchestrator(this, this.player1, this.player2);
+    this.setPickEnabled(true);
   }
 
   resetGUI() {
@@ -139,15 +143,15 @@ class XMLscene extends CGFscene {
     });
   }
 
-  updateLights(){
+  updateLights() {
     Object.keys(this.lightsState).forEach(key => {
       const currentLightState = this.lightsState[key];
       const currentLight = this.lights[currentLightState.lightIndex];
-      if(currentLightState.isEnabled)
+      if (currentLightState.isEnabled)
         currentLight.enable();
       else
-        currentLight.disable();  
-      currentLight.update();  
+        currentLight.disable();
+      currentLight.update();
     })
   }
 
@@ -185,7 +189,7 @@ class XMLscene extends CGFscene {
   }
 
   update(currTime) {
-    if(this.sceneInited){
+    if (this.sceneInited) {
       const currentInstant = currTime - this.time;
       this.graph.updateComponentAnimations(currentInstant);
     }
@@ -220,23 +224,36 @@ class XMLscene extends CGFscene {
 
     // Apply transformations corresponding to the camera position relative to the origin
     this.applyViewMatrix();
-    
+
     this.pushMatrix();
     this.axis.display();
-    
+
     if (this.sceneInited) {
       // Draw axis
-      this.updateLights(); 
+      this.updateLights();
       this.setDefaultAppearance();
 
       // Displays the scene (MySceneGraph function).
       this.graph.displayScene();
-
       this.gameOrchestrator.display();
-}
+    }
 
     this.popMatrix();
     // ---- END Background, camera and axis setup
+  }
+
+  logPicking() {
+    if (!this.pickMode && this.pickResults
+      && this.pickResults.length > 0 && this.gameOrchestrator.blMoves) {
+
+      this.gameOrchestrator.possibleMoves.splice(0, this.gameOrchestrator.possibleMoves.length);
+      const validResults = this.pickResults.filter(result => result[0]);
+      validResults.forEach(result => {
+        result[0](this);
+      });
+
+      this.pickResults.splice(0, this.pickResults.length);
+    }
   }
 
   display() {
@@ -246,6 +263,11 @@ class XMLscene extends CGFscene {
     this.render(this.secondaryCamera);
     this.securityCameraTexture.detachFromFrameBuffer();
     */
+
+    this.logPicking();
+    this.clearPickRegistration();
+    registerCounter = 1;
+
 
     this.render(this.sceneCamera);
 

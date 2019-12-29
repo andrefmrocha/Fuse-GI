@@ -78,24 +78,51 @@ serialInclude([
   'animation/KeyframeAnimation.js',
   'MySecurityCamera.js',
   'MyGameOrchestrator.js',
+  'MyScoreBoard.js',
   'cgfobjreader/CGFOBJModel.js',
   'cgfobjreader/CGFResourceReader.js',
 
   (main = function() {
-    // Standard application, scene and interface setup
-    var app = new CGFapplication(document.body);
-    var myInterface = new MyInterface();
-    var myScene = new XMLscene(myInterface);
+ 
+    document.querySelectorAll('#menu > article').forEach((player) => addDropdown(player));
+    document.querySelector('#menu > div > input').addEventListener('click', () => {
+      let error = false;
+      const values = ['player-1', 'player-2'].map((player) => {
+        const playerArticle = document.querySelector(`#${player}`);
+        const playerType = playerArticle.querySelector('input[value="human"]').checked ? "human" 
+        : playerArticle.querySelector('input[value="robot"]').checked ? "robot": null;
+        if(!playerType){
+          error = true;
+          return null;
+        }else if(playerType == "robot"){
+          return {
+            type: playerType,
+            difficulty: Number(playerArticle.querySelector('select').value)
+          }
+        }
+        return {
+          type: playerType
+        }
+      });
 
-    app.init();
+      if(!error){
+        document.querySelector('#menu').style.display = "none";
+        document.querySelector('#panel').style.display = "block";
+        startGame(values[0], values[1]);
+      }
+    });
+  })
+]);
 
-    app.setScene(myScene);
-    app.setInterface(myInterface);
 
-    myInterface.setActiveCamera(myScene.camera);
+function startGame(player1, player2){
+  // Standard application, scene and interface setup
+  
+  var app = new CGFapplication(document.body);
+  var myInterface = new MyInterface();
+  var myScene = new XMLscene(myInterface, player1, player2);
 
-    // get file name provided in URL, e.g. http://localhost/myproj/?file=myfile.xml
-    // or use "demo.xml" as default (assumes files in subfolder "scenes", check MySceneGraph constructor)
+  app.init();
 
     const ambients = [
       'space.xml',
@@ -104,11 +131,17 @@ serialInclude([
       'demo.xml'
     ];
 
+  myInterface.setActiveCamera(myScene.camera);
+
     // create and load graph, and associate it to scene.
     // Check console for loading errors
     var myGraph = new MySceneGraph(ambients, myScene);
 
-    // start
-    app.run();
-  })
-]);
+  app.run();
+}
+
+function addDropdown(player){
+  player.querySelector('input[value="robot"]').addEventListener('change', () => {
+    player.querySelector('select').style.display="block";
+  });
+}
