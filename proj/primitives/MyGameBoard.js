@@ -46,7 +46,7 @@ class MyGameBoard extends CGFobject {
                 // display disc if it exists
                 if(this.boardReady && boardCell != "empty") {
                     this.playerPiece.setColor(boardCell);
-                    this.playerPiece.display();
+                    this.playerPiece.display(row, col);
                 }
                 this.scene.popMatrix(); 
                 this.scene.popMatrix();
