@@ -9,7 +9,7 @@ class MyAuxBoard extends CGFobject {
         this.centerPos = centerPos;
     
         this.boardCell = new MyBoardCell(scene, false);
-        this.disc = new MyDisc(scene, color);
+        this.playerPiece = new MyPlayerPiece(scene, color);
 
         // Start animation variables
         this.startAnimationDuration = 3;
@@ -168,7 +168,7 @@ class MyAuxBoard extends CGFobject {
 
                     this.scene.scale(...anim_scale);
 
-                    this.disc.display();
+                    this.playerPiece.display();
                     this.scene.popMatrix();
                     added_pieces++;
                 }

@@ -7,7 +7,7 @@ class MyGameBoard extends CGFobject {
         this.cols = jsonBoard[0].length;
     
         this.boardCell = new MyBoardCell(scene, true);
-        this.disc = new MyDisc(scene);
+        this.playerPiece = new MyPlayerPiece(scene);
         this.validCell = new MyValidCell(scene);
 
         this.surfaceHeight = 0.5;
@@ -45,8 +45,8 @@ class MyGameBoard extends CGFobject {
 
                 // display disc if it exists
                 if(this.boardReady && boardCell != "empty") {
-                    this.disc.setColor(boardCell);
-                    this.disc.display();
+                    this.playerPiece.setColor(boardCell);
+                    this.playerPiece.display();
                 }
                 this.scene.popMatrix(); 
                 this.scene.popMatrix();
