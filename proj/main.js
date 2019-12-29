@@ -65,7 +65,7 @@ serialInclude([
   'primitives/MyGameBoard.js',
   'primitives/MyAuxBoard.js',
   'primitives/MyValidCell.js',
-  'primitives/MyDisc.js',
+  'primitives/MyPlayerPiece.js',
   'parser/PrimitivesParser.js',
   'parser/ViewsParser.js',
   'parser/TextureParser.js',
@@ -79,6 +79,8 @@ serialInclude([
   'MySecurityCamera.js',
   'MyGameOrchestrator.js',
   'MyScoreBoard.js',
+  'cgfobjreader/CGFOBJModel.js',
+  'cgfobjreader/CGFResourceReader.js',
 
   (main = function() {
  
@@ -122,19 +124,20 @@ function startGame(player1, player2){
 
   app.init();
 
+  const ambients = [
+    'space.xml',
+    'T6_G05.xml',
+    'T6_G07.xml',
+    'demo.xml'
+  ];
+  
   app.setScene(myScene);
   app.setInterface(myInterface);
-
   myInterface.setActiveCamera(myScene.camera);
-
-  // get file name provided in URL, e.g. http://localhost/myproj/?file=myfile.xml
-  // or use "demo.xml" as default (assumes files in subfolder "scenes", check MySceneGraph constructor)
-
-  var filename = getUrlVars()['file'] || 'scene.xml';
 
     // create and load graph, and associate it to scene.
     // Check console for loading errors
-  var myGraph = new MySceneGraph(filename, myScene);
+    var myGraph = new MySceneGraph(ambients, myScene);
 
   app.run();
 }

@@ -6,6 +6,7 @@ const PLAYER_2 = "bl";
 class MyGameOrchestrator extends CGFobject {
     constructor(scene, player1, player2) {
         super(scene);
+        scene.orchestrator = this;
 
         this.playerInfo = {}
         this.playerInfo[PLAYER_1] = player1;

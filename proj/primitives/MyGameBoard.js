@@ -7,7 +7,7 @@ class MyGameBoard extends CGFobject {
         this.cols = jsonBoard[0].length;
 
         this.boardCell = new MyBoardCell(scene, true);
-        this.disc = new MyDisc(scene);
+        this.playerPiece = new MyPlayerPiece(scene);
         this.validCell = new MyValidCell(scene);
 
         this.boardReady = false;
@@ -54,8 +54,8 @@ class MyGameBoard extends CGFobject {
                     else {
                         this.scene.gameOrchestrator.discAsValidMove(col, row);
                     }
-                    this.disc.setColor(boardCell);
-                    this.disc.display();
+                    this.playerPiece.setColor(boardCell);
+                    this.playerPiece.display();
                     this.scene.clearPickRegistration();
                 }
 

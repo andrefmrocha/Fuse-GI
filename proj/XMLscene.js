@@ -27,7 +27,7 @@ class XMLscene extends CGFscene {
     this.sceneInited = false;
 
     this.currentView;
-    this.securityView;
+    //this.securityView;
     this.initCameras();
 
     this.enableTextures(true);
@@ -50,17 +50,31 @@ class XMLscene extends CGFscene {
     this.setPickEnabled(true);
   }
 
+  resetGUI() {
+    if (!this.sceneInited) return;
+
+    this.interface.gui.remove(this.currentViewGUI);
+    this.interface.gui.remove(this.ambientViewGUI);
+
+    Object.keys(this.lightsGUI).forEach(k => {
+      this.interface.gui.remove(this.lightsGUI[k]);
+    });
+    this.lightsGUI = {};
+  }
+
   addViews(defaultCamera) {
     this.currentView = defaultCamera ? defaultCamera : Object.keys(this.views)[0];
-    this.securityView = this.currentView;
-    this.interface.gui
+    this.currentViewGUI = this.interface.gui
       .add(this, 'currentView', Object.keys(this.views))
       .name('Scene View')
       .onChange(this.onSelectedView.bind(this));
-    this.interface.gui
-      .add(this, 'securityView', Object.keys(this.views))
-      .name('Security Camera')
-      .onChange(this.onSelectedView.bind(this));
+  }
+
+  addAmbients() {
+    this.ambientViewGUI = this.interface.gui
+      .add(this.graph, 'newAmbient', Object.keys(this.graph.ambients))
+      .name('Selected Ambient')
+      .onChange(this.graph.onSelectedAmbient.bind(this.graph));
   }
 
   onSelectedView() {
@@ -82,10 +96,14 @@ class XMLscene extends CGFscene {
    */
   initLights() {
     // Reads the lights from the scene graph.
-    this.lightsState = {};
-    Object.keys(this.graph.lights).forEach((key, index) => {
+    this.lightsState = {};    
+    
+    Object.keys(this.lights).forEach(key => this.lights[key].visible = false);
+
+    const lights = this.graph.ambients[this.graph.selectedAmbient].lights;
+    Object.keys(lights).forEach((key, index) => {
       if (index < 8) { // Only eight lights allowed by WebGL.
-        const light = this.graph.lights[key];
+        const light = lights[key];
 
         const attenuation = light[6];
         this.lights[index].setPosition(light[2][0], light[2][1], light[2][2], light[2][3]);
@@ -118,9 +136,10 @@ class XMLscene extends CGFscene {
     this.addLightsToInterface();
   }
 
-  addLightsToInterface() {
-    Object.keys(this.lightsState).forEach(key => {
-      this.interface.gui.add(this.lightsState[key], 'isEnabled').name(key);
+  addLightsToInterface(){
+    this.lightsGUI = {};
+    Object.keys(this.lightsState).forEach((key,i) => {
+      this.lightsGUI[i] = this.interface.gui.add(this.lightsState[key], 'isEnabled').name(key);
     });
   }
 
@@ -148,18 +167,20 @@ class XMLscene extends CGFscene {
   onGraphLoaded() {
     this.axis = new CGFaxis(this, this.graph.referenceLength);
 
+    const background_color = this.graph.getBackground();
+    const global_ambient = this.graph.getGlobalAmbient();
     this.gl.clearColor(
-      this.graph.background[0],
-      this.graph.background[1],
-      this.graph.background[2],
-      this.graph.background[3]
+      background_color[0],
+      background_color[1],
+      background_color[2],
+      background_color[3]
     );
 
     this.setGlobalAmbientLight(
-      this.graph.ambient[0],
-      this.graph.ambient[1],
-      this.graph.ambient[2],
-      this.graph.ambient[3]
+      global_ambient[0],
+      global_ambient[1],
+      global_ambient[2],
+      global_ambient[3]
     );
 
     this.initLights();

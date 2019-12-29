@@ -1,5 +1,5 @@
 <lxs>
-    <scene root="rectangleTest" axis_length="5"/>
+    <scene root="demoRoot" axis_length="5"/>
 
     <views default="testCamera">
         <perspective id="defaultCamera" near="5" far="500" angle="45">
@@ -28,8 +28,7 @@
     </lights>
 
     <textures>
-        <texture id="demoTexture" file="scenes/images/cosmos.jpg" />
-        <texture id="neon" file="scenes/images/neon-sign.jpg" />
+        <texture id="demoTexture" file="scenes/images/board_wood.jpg" />
     </textures>
 
     <materials>
@@ -55,85 +54,24 @@
         </transformation>
     </transformations>
 
+    <animations>
+        <animation id="diner" isLoop="isLoop">
+            <keyframe instant="2">
+                <translate x="0" y="0.0" z="0.0" />
+                <rotate angle_x="0" angle_y="-180" angle_z="0" />
+                <scale x="1" y="1" z="1" />
+            </keyframe>
+            <keyframe instant="4">
+                <translate x="0" y="0" z="0.0" />
+                <rotate angle_x="0" angle_y="-360" angle_z="0" />
+                <scale x="1" y="1" z="1" />
+            </keyframe>
+        </animation>
+    </animations>
+
     <primitives>
         <primitive id="demoTriangle">
-            <!-- <rectangle x1="-0.5" y1="-1" x2="0.5" y2="1" /> -->
             <triangle x1="-1.5" y1="0" z1="0" x2="1.5" y2="0" z2="0" x3="0" y3="3" z3="0" />
-            <!-- <torus inner="1" outer="3" slices="10" loops="10"/> -->
-            <!-- <cylinder base="1" top="0.5" height="4" slices="10" stacks="10"/> -->
-            <!-- <sphere radius="1" slices="10" stacks="10"/> -->
-        </primitive>
-        <primitive id="demoRectangle">
-            <rectangle x1="-2" y1="-2" x2="2" y2="2" />
-        </primitive>
-        <primitive id="demoSphere">
-            <sphere radius="1" slices="10" stacks="10"/>
-        </primitive>
-        <primitive id="demoCylinder">
-            <cylinder base="1" top="3" height="3" slices="9" stacks="9"/>
-        </primitive>
-        <primitive id="demoTorus">
-            <torus inner="1" outer="3" slices="10" loops="10"/>
-        </primitive>
-        <primitive id="plane">
-            <plane npartsU="2" npartsV="2"/>
-        </primitive>
-        <primitive id="patch1">
-            <patch npointsU="2" npointsV="2" npartsU="20" npartsV="20">
-                <controlpoint xx="-2" yy="-2" zz="0" />
-                <controlpoint xx="-2" yy="2" zz="0" />
-                <controlpoint xx="2" yy="-2" zz="0" />
-                <controlpoint xx="2" yy="2" zz="0" />
-            </patch>
-        </primitive>
-        <primitive id="patch2">
-            <patch npointsU="3" npointsV="2" npartsU="20" npartsV="20">
-                <controlpoint xx="-1.5" yy="-1.5" zz="0" />
-                <controlpoint xx="-1.5" yy="1.5" zz="0" />
-                <controlpoint xx="0" yy="-1.5" zz="3" />
-                <controlpoint xx="0" yy="1.5" zz="3" />
-                <controlpoint xx="1.5" yy="-1.5" zz="0" />
-                <controlpoint xx="1.5" yy="1.5" zz="0" />
-            </patch>
-        </primitive>
-        <primitive id="patch3">
-            <patch npointsU="3" npointsV="4" npartsU="20" npartsV="20">
-                <controlpoint xx="-1.5" yy="-1.5" zz="0" />
-                <controlpoint xx="-2" yy="-2" zz="2" />
-                <controlpoint xx="-2" yy="2" zz="2" />
-                <controlpoint xx="-1.5" yy="1.5" zz="0" />
-
-                <controlpoint xx="0" yy="0" zz="3" />
-                <controlpoint xx="0" yy="-2" zz="3" />
-                <controlpoint xx="0" yy="2" zz="3" />
-                <controlpoint xx="0" yy="0" zz="3" />
-
-                <controlpoint xx="1.5" yy="-1.5" zz="0" />
-                <controlpoint xx="2" yy="-2" zz="2" />
-                <controlpoint xx="2" yy="2" zz="2" />
-                <controlpoint xx="1.5" yy="1.5" zz="0" />
-            </patch>
-        </primitive>
-        <primitive id="patch4">
-            <patch npointsU="3" npointsV="4" npartsU="20" npartsV="20">
-                <controlpoint xx="-2" yy="-2" zz="1" />
-                <controlpoint xx="-2" yy="-1" zz="-2" />
-                <controlpoint xx="-2" yy="1" zz="5" />
-                <controlpoint xx="-2" yy="2" zz="-1" />
-
-                <controlpoint xx="0" yy="-2" zz="0" />
-                <controlpoint xx="0" yy="-1" zz="-1" />
-                <controlpoint xx="0" yy="1" zz="1.5" />
-                <controlpoint xx="0" yy="2" zz="0" />
-
-                <controlpoint xx="2" yy="-2" zz="-1" />
-                <controlpoint xx="2" yy="-1" zz="2" />
-                <controlpoint xx="2" yy="1" zz="-5" />
-                <controlpoint xx="2" yy="2" zz="1" />
-            </patch>
-        </primitive>
-        <primitive id="cylinder2">
-            <cylinder2 base="1" top="3" height="3" slices="9" stacks="9"/>
         </primitive>
     </primitives>
 
@@ -149,118 +87,6 @@
             <texture id="demoTexture" length_s="6" length_t="1.5"/>
             <children>
                 <primitiveref id="demoTriangle" />
-            </children>
-        </component>
-        <component id="cylinderTest">
-            <transformation>
-            </transformation>
-            <materials>
-                <material id="demoMaterial2" />
-            </materials>
-            <texture id="neon" length_s="1" length_t="1"/>
-            <children>
-                <primitiveref id="demoCylinder" />
-            </children>
-        </component>
-
-        
-        <component id="sphereTest">
-            <transformation>
-            </transformation>
-            <materials>
-                <material id="demoMaterial2" />
-            </materials>
-            <texture id="demoTexture" length_s="1" length_t="1"/>
-            <children>
-                <primitiveref id="demoSphere" />
-            </children>
-        </component>
-
-        <component id="triangleTest">
-            <transformation>
-            </transformation>
-            <materials>
-                <material id="demoMaterial2" />
-            </materials>
-            <texture id="demoTexture" length_s="3" length_t="3"/>
-            <children>
-                <primitiveref id="demoTriangle" />
-            </children>
-        </component>
-        
-        <component id="rectangleTest">
-            <transformation>
-                <scale x="10" y="10" z="10" />
-            </transformation>
-            <materials>
-                <material id="demoMaterial2" />
-            </materials>
-            <texture id="neon" length_s="4" length_t="4" />
-            <children>
-                <primitiveref id="demoRectangle" />
-            </children>
-        </component>
-
-
-        <component id="torusTest">
-            <transformation>
-            </transformation>
-            <materials>
-                <material id="demoMaterial2" />
-            </materials>
-            <texture id="demoTexture" length_s="4" length_t="4"/>
-            <children>
-                <primitiveref id="demoTorus" />
-            </children>
-        </component>
-
-        <component id="patchTest">
-            <transformation>
-            </transformation>
-            <materials>
-                <material id="demoMaterial" />
-            </materials>
-            <texture id="demoTexture" length_s="4" length_t="4"/>
-            <children>
-                <primitiveref id="patch4" />
-            </children>
-        </component>
-
-        <component id="planeTest">
-            <transformation>
-            </transformation>
-            <materials>
-                <material id="demoMaterial" />
-            </materials>
-            <texture id="demoTexture" length_s="2" length_t="2"/>
-            <children>
-                <primitiveref id="plane" />
-            </children>
-        </component>
-
-        <component id="cylinder2Test">
-            <transformation>
-                <translate x="7" y="0" z="0" />
-            </transformation>
-            <materials>
-                <material id="demoMaterial2" />
-            </materials>
-            <texture id="neon" length_s="2" length_t="2"/>
-            <children>
-                <primitiveref id="cylinder2" />
-            </children>
-        </component>
-        
-        <component id="cylindersCompare">
-            <transformation>
-            </transformation>
-            <materials>
-                <material id="demoMaterial2" />
-            </materials>
-            <texture id="demoTexture" length_s="2" length_t="2"/>
-            <children>
-                <componentref id="cylinder2Test" />
-                <componentref id="cylinderTest" />
             </children>
         </component>
 
