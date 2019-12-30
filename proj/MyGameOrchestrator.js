@@ -2,6 +2,7 @@ const PLAYER_1 = "wt";
 const HUMAN = "human";
 const BOT = "robot";
 const PLAYER_2 = "bl";
+const START_DELAY_TIME = 5;
 const CAMERA_ANIMATION_TIME = 3;
 const MOVEMENT_ANIMATION_TIME = 1;
 let animationID = 0;
@@ -26,11 +27,6 @@ class MyGameOrchestrator extends CGFobject {
         this.blackBoardPos = [-this.auxBoardOffset, 0, 0];
 
 
-        this.gameReady = false;
-        this.piecesInBoard = false;
-        this.initGame();
-
-
         this.auxBoardWhite = new MyAuxBoard(scene, 0, "wt");
         this.auxBoardBlack = new MyAuxBoard(scene, 0, "bl");
         this.board = new MyGameBoard(scene, [[]]);
@@ -38,6 +34,10 @@ class MyGameOrchestrator extends CGFobject {
         this.validCell = new MyValidCell(scene);
         this.moves = [];
         this.animations = [];
+
+        this.gameReady = false;
+        this.piecesInBoard = false;
+        this.initGame();
     }
 
     switchPlayers() {
@@ -91,11 +91,8 @@ class MyGameOrchestrator extends CGFobject {
         })
 
         const movement = await response.json();
-
         const move = [movement.xi, movement.yi, movement.xf, movement.yf];
-        this.moveBoard(move, this.boardState, true);
-
-        this.moves.push({ move, type: BOT });
+        this.botMove = move;
     }
 
     async initGame() {
@@ -109,7 +106,6 @@ class MyGameOrchestrator extends CGFobject {
         const boardJson = await genBoardResponse.json();
         this.boardState = boardJson.board;
         this.initialBoard = this.boardState.map(row => row.slice());
-        this.getMoves();
         this.board = new MyGameBoard(this.scene, this.boardState);
 
         const piecesPositions = this.determinePiecesInitialPositions(boardJson.board);
@@ -119,6 +115,10 @@ class MyGameOrchestrator extends CGFobject {
             new MyAuxBoard(this.scene, piecesPositions["bl"].length, "bl", this.blackBoardPos, piecesPositions, true);
 
         this.gameReady = true;
+        setTimeout(() => {
+            this.delayEnded = true;
+            this.getMoves();
+        }, START_DELAY_TIME * 1000);
     }
 
     determinePiecesInitialPositions(board) {
@@ -150,7 +150,7 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     update(time) {
-        if (this.gameReady && !this.piecesInBoard) {
+        if (this.delayEnded && !this.piecesInBoard) {
             this.auxBoardBlack.update(time);
             this.auxBoardWhite.update(time);
 
@@ -163,6 +163,15 @@ class MyGameOrchestrator extends CGFobject {
         }
 
         this.animations.forEach(animation => animation.update(time));
+
+        if(!this.piecesInBoard) return;
+
+        if (this.botMove) {
+            const move = this.botMove;
+            this.moveBoard(move, this.boardState, true);    
+            this.moves.push({ move, type: BOT });
+            this.botMove = null;
+        }
     }
 
     display() {
@@ -294,7 +303,7 @@ class MyGameOrchestrator extends CGFobject {
     cameraChange(initialTime, initialCamera, finalCamera) {
         const finalTime = initialTime + 1000 * CAMERA_ANIMATION_TIME;
 
-        const animation = new MyAnimation(
+        const animation = new MyAnimation(animationID++,
             (time) => {
                 const timeFactor = 1 - (finalTime - time) / (finalTime - initialTime);
                 if(timeFactor >= 1) return true;
@@ -317,7 +326,7 @@ class MyGameOrchestrator extends CGFobject {
 
             },
             () => {
-                this.animations.splice(this.animations.indexOf(animation, 1));
+                this.animations.splice(this.animations.indexOf(animation), 1);
                 this.scene.sceneCamera = new CGFcamera(...Object.keys(finalCamera).map(key => finalCamera[key]));
             }
         );
