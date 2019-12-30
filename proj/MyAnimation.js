@@ -3,7 +3,8 @@
      * @param  {Array} args
      * @param  {Function} onFinished
      */class MyAnimation{
-    constructor(animation, onFinished){
+    constructor(ID, animation, onFinished){
+        this.ID = ID;
         this.animation = animation;
         this.onFinished = onFinished;
 

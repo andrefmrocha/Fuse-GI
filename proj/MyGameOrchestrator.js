@@ -4,6 +4,7 @@ const BOT = "robot";
 const PLAYER_2 = "bl";
 const CAMERA_ANIMATION_TIME = 3;
 const MOVEMENT_ANIMATION_TIME = 1;
+let animationID = 0;
 
 class MyGameOrchestrator extends CGFobject {
     constructor(scene, player1, player2) {
@@ -339,7 +340,7 @@ class MyGameOrchestrator extends CGFobject {
             z: -(end_z - start_z)
         };
 
-        const animation = new MyAnimation(
+        const animation = new MyAnimation(animationID++,
             (time) => {
                 // disable player interaction
                 this.board.isAnimating = true;
