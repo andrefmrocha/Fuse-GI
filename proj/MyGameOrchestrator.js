@@ -315,6 +315,7 @@ class MyGameOrchestrator extends CGFobject {
             },
             () => {
                 this.animations.splice(this.animations.indexOf(animation, 1));
+                this.scene.changeViewActivity(false);
                 this.scene.sceneCamera = new CGFcamera(...Object.keys(finalCamera).map(key => finalCamera[key]));
             }
         );

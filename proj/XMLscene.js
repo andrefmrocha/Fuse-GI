@@ -77,7 +77,13 @@ class XMLscene extends CGFscene {
       .onChange(this.graph.onSelectedAmbient.bind(this.graph));
   }
 
+  changeViewActivity(disabled) {
+    const view = document.querySelector('.cr.string .c > select')
+    view.disabled = disabled;
+  }
+
   onSelectedView() {
+    this.changeViewActivity(true);
     this.gameOrchestrator.cameraChange(this.currentTime, this.sceneCamera, this.views[this.currentView]);
     // this.sceneCamera = new CGFcamera(...Object.values(this.views[this.currentView]));
     // this.interface.setActiveCamera(new CG);
