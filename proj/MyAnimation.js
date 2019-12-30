@@ -3,14 +3,19 @@
      * @param  {Array} args
      * @param  {Function} onFinished
      */class MyAnimation{
-    constructor(animation, onFinished){
+    constructor(ID, animation, onFinished){
+        this.ID = ID;
         this.animation = animation;
         this.onFinished = onFinished;
+
+        this.finished = false;
     }
 
     update(time){
-       if(this.animation(time))
-        this.onFinished();
+        if(!this.finished && this.animation(time)) {
+            this.onFinished();
+            this.finished = true;
+        }
 
     }
 }

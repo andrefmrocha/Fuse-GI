@@ -3,6 +3,8 @@ const HUMAN = "human";
 const BOT = "robot";
 const PLAYER_2 = "bl";
 const CAMERA_ANIMATION_TIME = 3;
+const MOVEMENT_ANIMATION_TIME = 1;
+let animationID = 0;
 
 class MyGameOrchestrator extends CGFobject {
     constructor(scene, player1, player2) {
@@ -91,8 +93,7 @@ class MyGameOrchestrator extends CGFobject {
         const movement = await response.json();
 
         const move = [movement.xi, movement.yi, movement.xf, movement.yf];
-        this.moveBoard(move, this.boardState);
-        this.getMoves();
+        this.moveBoard(move, this.boardState, true);
 
         this.moves.push({ move, type: BOT });
     }
@@ -225,7 +226,7 @@ class MyGameOrchestrator extends CGFobject {
         }
     }
 
-    moveBoard(move, board) {
+    moveBoard(move, board, animate) {
         const zMove = move[3] - move[1];
         const xMove = move[2] - move[0];
 
@@ -238,6 +239,7 @@ class MyGameOrchestrator extends CGFobject {
                 const distance = reachingIndex + (indexes.length - i) * ((zMove > 0) ? 1 : -1);
                 board[distance][move[0]] = board[index][move[0]];
                 board[index][move[0]] = "empty";
+                animate && this.animateMovement([index, move[0]], [distance, move[0]], false);
             });
 
         } else {
@@ -249,22 +251,23 @@ class MyGameOrchestrator extends CGFobject {
                 const distance = reachingIndex + (indexes.length - i) * ((xMove > 0) ? 1 : -1);
                 row[distance] = row[index];
                 row[index] = "empty";
+                animate && this.animateMovement([move[1], index], [move[1], distance], false);
             })
         }
-
+       
         board[move[3]][move[2]] = board[move[1]][move[0]];
         board[move[1]][move[0]] = "null";
+        animate && this.animateMovement([move[1], move[0]], [move[3], move[2]], true);
     }
 
     registerMovement(move) {
         this.scene.registerForPick(registerCounter++, () => {
-            this.moveBoard(move.move, this.boardState);
-            this.getMoves();
+            this.moveBoard(move.move, this.boardState, true);
             this.moves.push({ ...move, type: HUMAN });
         });
     }
 
-    discAsValidMove(col, row) {
+    discHasValidMove(col, row) {
         const discMove = this.possibleMoves.find((move) => move.move[2] == col && move.move[3] == row);
         if (discMove) {
             this.registerMovement(discMove);
@@ -281,7 +284,7 @@ class MyGameOrchestrator extends CGFobject {
         this.moves.splice(this.moves.length - 1, 1);
 
         const board = this.initialBoard.map(row => row.slice());
-        this.moves.forEach((move) => this.moveBoard(move.move, board));
+        this.moves.forEach((move) => this.moveBoard(move.move, board, false));
         this.boardState = board;
         this.board.board = board;
         this.switchPlayers();
@@ -316,6 +319,52 @@ class MyGameOrchestrator extends CGFobject {
             () => {
                 this.animations.splice(this.animations.indexOf(animation, 1));
                 this.scene.sceneCamera = new CGFcamera(...Object.keys(finalCamera).map(key => finalCamera[key]));
+            }
+        );
+        this.animations.push(animation);
+    }
+
+    animateMovement(initialPos, endPos, changePlayer) {
+        const initialTime = this.scene.currentTime;
+        const finalTime = initialTime + 1000 * MOVEMENT_ANIMATION_TIME;
+
+        const animation = new MyAnimation(animationID++,
+            (time) => {
+                // disable player interaction
+                this.board.isAnimating = true;
+
+                const timeFactor = 1 - (finalTime - time) / (finalTime - initialTime);
+                if(timeFactor >= 1) return true;
+
+                // add offset to piece without changing its position
+                const start_x = initialPos[1];
+                const end_x = endPos[1];
+                const start_z = initialPos[0];
+                const end_z = endPos[0];
+
+                // animation is inverted, calculates from end to start position
+                const anim_x_offset = -(end_x - start_x) * (1-timeFactor);
+                const anim_z_offset = -(end_z - start_z) * (1-timeFactor);
+
+                // store piece offset
+                this.board.animationsOffsets[[endPos[0], endPos[1]]] = {
+                    x: anim_x_offset,
+                    y: 0,
+                    z: anim_z_offset
+                };
+            },
+            () => {
+                //this.animations.splice(this.animations.indexOf(animation, 1));
+
+                // set offset to 0
+                delete this.board.animationsOffsets[[endPos[0], endPos[1]]];
+
+                // enable player interaction
+                if (!Object.keys(this.board.animationsOffsets).length)
+                    this.board.isAnimating = false;
+
+                // handle next move
+                if(changePlayer) this.getMoves();
             }
         );
         this.animations.push(animation);

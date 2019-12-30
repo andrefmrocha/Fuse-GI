@@ -12,6 +12,9 @@ class MyGameBoard extends CGFobject {
 
         this.boardReady = false;
         this.surfaceHeight = 0.5;
+
+        this.isAnimating = false;
+        this.animationsOffsets = {};
     }
 
     isInside(row, col) {
@@ -49,11 +52,19 @@ class MyGameBoard extends CGFobject {
 
                 // display disc if it exists
                 if (this.boardReady && boardCell != "empty" && boardCell != "null") {
-                    if (!this.isInside(row, col))
-                      this.scene.gameOrchestrator.registerDisc(boardCell, col, row);
-                    else {
-                        this.scene.gameOrchestrator.discAsValidMove(col, row);
+                    if (!this.isAnimating) {
+                        if (!this.isInside(row, col))
+                            this.scene.gameOrchestrator.registerDisc(boardCell, col, row);
+                        else {
+                            this.scene.gameOrchestrator.discHasValidMove(col, row);
+                        }
                     }
+
+                    const anim_offset = this.animationsOffsets[[row,col]];
+                    if (anim_offset) {
+                        this.scene.translate(anim_offset.x, anim_offset.y, anim_offset.z);
+                    }
+
                     this.playerPiece.setColor(boardCell);
                     this.playerPiece.display();
                     this.scene.clearPickRegistration();
