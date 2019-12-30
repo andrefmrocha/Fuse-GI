@@ -36,9 +36,15 @@ class MyGameOrchestrator extends CGFobject {
         this.validCell = new MyValidCell(scene);
         this.moves = [];
         this.animations = [];
+        this.movesPassed = 0;
     }
 
-    switchPlayers() {
+    switchPlayers(player) {
+        if(player){
+            this.currentPlayer = player;
+            return;
+        }
+
         switch (this.currentPlayer) {
             case PLAYER_1:
                 this.currentPlayer = PLAYER_2;
@@ -54,7 +60,24 @@ class MyGameOrchestrator extends CGFobject {
     }
 
 
-    getMoves() {
+    async getMoves() {
+        if(this.movesPassed == 2){
+            console.info('Game has finished!');
+            this.playerMoves = undefined;
+            const points = await ScoreBoard.displayInfo(this.currentPlayer, this.playerPointsURL, this.boardState);
+
+            if(points[PLAYER_1] == points[PLAYER_2]){
+                alert("It's a tie!")
+            }
+            else if(points[PLAYER_1] > points[PLAYER_2]){
+                alert('Player 1 has won!');
+            } else {
+                alert('Player 2 has won!');
+            }
+            this.scene.addResetButton();
+            return;
+        }
+
         this.switchPlayers();
         if (this.playerInfo[this.currentPlayer].type == HUMAN)
             this.getPlayerMoves();
@@ -63,21 +86,19 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     async getPlayerMoves() {
-        const wtResponse = await postRequest(this.userMoveURL, {
+        const response = await postRequest(this.userMoveURL, {
             board: this.boardState,
-            player: 0
+            player: this.currentPlayer == PLAYER_1 ? 0: 1
         });
 
-        const wtmovesJson = await wtResponse.json();
-        this.wtMoves = wtmovesJson.move;
-
-        const blResponse = await postRequest(this.userMoveURL, {
-            board: this.boardState,
-            player: 1
-        });
-
-        const blmovesJson = await blResponse.json();
-        this.blMoves = blmovesJson.move;
+        const moves = await response.json()
+        this.playerMoves = moves.move;
+        if(moves.move.length == 0){
+            this.movesPassed++;
+            this.getMoves();
+        } else {
+            this.movesPassed = 0;
+        }
 
     }
 
@@ -86,15 +107,24 @@ class MyGameOrchestrator extends CGFobject {
             board: this.boardState,
             player: this.currentPlayer == PLAYER_1 ? 0 : 1,
             difficulty: this.playerInfo[this.currentPlayer].difficulty
-        })
+        });
+
+        if(response.status == 204){
+            this.movesPassed++;
+            this.getMoves();
+            return;
+        }
+
+        this.movesPassed = 0;
 
         const movement = await response.json();
 
         const move = [movement.xi, movement.yi, movement.xf, movement.yf];
         this.moveBoard(move, this.boardState);
+        this.moves.push({ move, player: this.currentPlayer });
+
         this.getMoves();
 
-        this.moves.push({ move, type: BOT });
     }
 
     async initGame() {
@@ -185,8 +215,7 @@ class MyGameOrchestrator extends CGFobject {
         this.playerInfo[this.currentPlayer].type == HUMAN && this.currentPlayer == boardCell
             && this.scene.registerForPick(registerCounter++,
                 () => {
-                    const moves = boardCell == "wt" ? this.wtMoves :
-                        this.blMoves;
+                    const moves = this.playerMoves;
                     const validMoves = moves.filter(move => move[0] == col && move[1] == row);
                     validMoves.forEach((move) =>
                         this.possibleMoves.push({
@@ -259,8 +288,8 @@ class MyGameOrchestrator extends CGFobject {
     registerMovement(move) {
         this.scene.registerForPick(registerCounter++, () => {
             this.moveBoard(move.move, this.boardState);
+            this.moves.push({ ...move, player: this.currentPlayer });
             this.getMoves();
-            this.moves.push({ ...move, type: HUMAN });
         });
     }
 
@@ -271,12 +300,18 @@ class MyGameOrchestrator extends CGFobject {
         }
     }
 
+    isBotGame(){
+        return this.playerInfo[PLAYER_1].type == BOT 
+        &&  this.playerInfo[PLAYER_2].type == BOT;
+    }
+
     undo() {
-        if (this.moves.length == 0) return;
-        if (this.moves[this.moves.length - 1].type == BOT) {
-            this.switchPlayers();
+        if (this.moves.length == 0 || this.isBotGame()) return;
+        while(this.playerInfo[this.moves[this.moves.length - 1].player].type == BOT){
             this.moves.splice(this.moves.length - 1, 1);
         }
+
+        this.possibleMoves.splice(0, this.possibleMoves.length);
 
         this.moves.splice(this.moves.length - 1, 1);
 
@@ -284,7 +319,9 @@ class MyGameOrchestrator extends CGFobject {
         this.moves.forEach((move) => this.moveBoard(move.move, board));
         this.boardState = board;
         this.board.board = board;
-        this.switchPlayers();
+        this.switchPlayers(
+            this.moves.length != 0
+            && this.moves[this.moves.length - 1].player);
         this.getPlayerMoves();
     }
 
@@ -320,6 +357,13 @@ class MyGameOrchestrator extends CGFobject {
             }
         );
         this.animations.push(animation);
+    }
+
+    reset(){
+        document.querySelector('canvas').remove();
+        document.querySelector('#menu').style.display = "flex";
+        document.querySelector('#panel').style.display = "block";
+        this.scene.interface.gui.destroy();
     }
 
 }

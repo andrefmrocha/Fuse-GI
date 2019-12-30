@@ -13,5 +13,6 @@ const ScoreBoard = {
         const points = await response.json();
         whiteScore.textContent = points[PLAYER_1];
         blackScore.textContent = points[PLAYER_2];
+        return points;
     }
 }
