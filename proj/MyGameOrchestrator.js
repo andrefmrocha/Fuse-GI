@@ -4,7 +4,6 @@ const BOT = "robot";
 const PLAYER_2 = "bl";
 const CAMERA_ANIMATION_TIME = 3;
 const MOVEMENT_ANIMATION_TIME = 1;
-let animationID = 0;
 
 class MyGameOrchestrator extends CGFobject {
     constructor(scene, player1, player2) {
@@ -237,9 +236,9 @@ class MyGameOrchestrator extends CGFobject {
 
             indexes.forEach((index, i) => {
                 const distance = reachingIndex + (indexes.length - i) * ((zMove > 0) ? 1 : -1);
+                animate && this.animateMovement([index, move[0]], [distance, move[0]], false);
                 board[distance][move[0]] = board[index][move[0]];
                 board[index][move[0]] = "empty";
-                animate && this.animateMovement([index, move[0]], [distance, move[0]], false);
             });
 
         } else {
@@ -249,15 +248,15 @@ class MyGameOrchestrator extends CGFobject {
             this.checkIntersections(indexes, (i) => row[i], xMove, row.length, reachingIndex);
             indexes.forEach((index, i) => {
                 const distance = reachingIndex + (indexes.length - i) * ((xMove > 0) ? 1 : -1);
+                animate && this.animateMovement([move[1], index], [move[1], distance], false);
                 row[distance] = row[index];
                 row[index] = "empty";
-                animate && this.animateMovement([move[1], index], [move[1], distance], false);
             })
         }
        
+        animate && this.animateMovement([move[1], move[0]], [move[3], move[2]], true);
         board[move[3]][move[2]] = board[move[1]][move[0]];
         board[move[1]][move[0]] = "null";
-        animate && this.animateMovement([move[1], move[0]], [move[3], move[2]], true);
     }
 
     registerMovement(move) {
@@ -328,19 +327,25 @@ class MyGameOrchestrator extends CGFobject {
         const initialTime = this.scene.currentTime;
         const finalTime = initialTime + 1000 * MOVEMENT_ANIMATION_TIME;
 
-        const animation = new MyAnimation(animationID++,
+        const start_x = initialPos[1];
+        const end_x = endPos[1];
+        const start_z = initialPos[0];
+        const end_z = endPos[0];
+
+        // initial offset, to avoid visual delay until the next update
+        this.board.animationsOffsets[[endPos[0], endPos[1]]] = {
+            x: -(end_x - start_x),
+            y: 0,
+            z: -(end_z - start_z)
+        };
+
+        const animation = new MyAnimation(
             (time) => {
                 // disable player interaction
                 this.board.isAnimating = true;
 
                 const timeFactor = 1 - (finalTime - time) / (finalTime - initialTime);
                 if(timeFactor >= 1) return true;
-
-                // add offset to piece without changing its position
-                const start_x = initialPos[1];
-                const end_x = endPos[1];
-                const start_z = initialPos[0];
-                const end_z = endPos[0];
 
                 // animation is inverted, calculates from end to start position
                 const anim_x_offset = -(end_x - start_x) * (1-timeFactor);
@@ -354,7 +359,7 @@ class MyGameOrchestrator extends CGFobject {
                 };
             },
             () => {
-                //this.animations.splice(this.animations.indexOf(animation, 1));
+                this.animations.splice(this.animations.indexOf(animation), 1);
 
                 // set offset to 0
                 delete this.board.animationsOffsets[[endPos[0], endPos[1]]];
