@@ -27,9 +27,9 @@ class MyGameOrchestrator extends CGFobject {
         this.blackBoardPos = [-this.auxBoardOffset, 0, 0];
 
 
-        this.auxBoardWhite = new MyAuxBoard(scene, 0, "wt");
-        this.auxBoardBlack = new MyAuxBoard(scene, 0, "bl");
         this.board = new MyGameBoard(scene, [[]]);
+        this.auxBoardWhite = new MyAuxBoard(scene, this.board, 0, "wt");
+        this.auxBoardBlack = new MyAuxBoard(scene, this.board, 0, "bl");
         this.possibleMoves = [];
         this.validCell = new MyValidCell(scene);
         this.moves = [];
@@ -110,9 +110,9 @@ class MyGameOrchestrator extends CGFobject {
 
         const piecesPositions = this.determinePiecesInitialPositions(boardJson.board);
         this.auxBoardWhite =
-            new MyAuxBoard(this.scene, piecesPositions["wt"].length, "wt", this.whiteBoardPos, piecesPositions);
+            new MyAuxBoard(this.scene, this.board, piecesPositions["wt"].length, "wt", this.whiteBoardPos, piecesPositions);
         this.auxBoardBlack =
-            new MyAuxBoard(this.scene, piecesPositions["bl"].length, "bl", this.blackBoardPos, piecesPositions, true);
+            new MyAuxBoard(this.scene, this.board, piecesPositions["bl"].length, "bl", this.blackBoardPos, piecesPositions, true);
 
         this.gameReady = true;
         setTimeout(() => {
@@ -247,8 +247,7 @@ class MyGameOrchestrator extends CGFobject {
             indexes.forEach((index, i) => {
                 const distance = reachingIndex + (indexes.length - i) * ((zMove > 0) ? 1 : -1);
                 animate && this.animateMovement([index, move[0]], [distance, move[0]], false);
-                board[distance][move[0]] = board[index][move[0]];
-                board[index][move[0]] = "empty";
+                this.switchBoardPositions(board, move[0], index, move[0], distance, "empty");
             });
 
         } else {
@@ -259,14 +258,20 @@ class MyGameOrchestrator extends CGFobject {
             indexes.forEach((index, i) => {
                 const distance = reachingIndex + (indexes.length - i) * ((xMove > 0) ? 1 : -1);
                 animate && this.animateMovement([move[1], index], [move[1], distance], false);
-                row[distance] = row[index];
-                row[index] = "empty";
+                this.switchBoardPositions(board, index, move[1], distance, move[1], "empty");
             })
         }
        
         animate && this.animateMovement([move[1], move[0]], [move[3], move[2]], true);
-        board[move[3]][move[2]] = board[move[1]][move[0]];
-        board[move[1]][move[0]] = "null";
+        this.switchBoardPositions(board, move[0], move[1], move[2], move[3], "null");
+    }
+
+    switchBoardPositions(board, x1, y1, x2, y2, remainingVal) {
+        board[y2][x2] = board[y1][x1];
+        board[y1][x1] = remainingVal;
+
+        this.board.piecesRotation[[y2, x2]] = this.board.piecesRotation[[y1, x1]];
+        this.board.piecesRotation[[y1, x1]] = 0;
     }
 
     registerMovement(move) {

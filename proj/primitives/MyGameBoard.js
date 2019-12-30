@@ -15,6 +15,8 @@ class MyGameBoard extends CGFobject {
 
         this.isAnimating = false;
         this.animationsOffsets = {};
+
+        this.assignPiecesInitialRotation(jsonBoard);
     }
 
     isInside(row, col) {
@@ -65,6 +67,9 @@ class MyGameBoard extends CGFobject {
                         this.scene.translate(anim_offset.x, anim_offset.y, anim_offset.z);
                     }
 
+                    const pieceRotation = this.piecesRotation[[row,col]];
+                    if (pieceRotation) this.scene.rotate(pieceRotation, 0, 1, 0);
+
                     this.playerPiece.setColor(boardCell);
                     this.playerPiece.display();
                     this.scene.clearPickRegistration();
@@ -73,6 +78,24 @@ class MyGameBoard extends CGFobject {
 
                 this.scene.popMatrix();
                 this.scene.popMatrix();
+            }
+        }
+    }
+
+    assignPiecesInitialRotation(board) {
+        this.piecesRotation = {};
+        const rows = board.length;
+        const cols = board[0].length;
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+
+                let rotation = 0;
+                if (row == rows-1) rotation = Math.PI;
+                else if (col == 0) rotation = Math.PI/2;
+                else if (col == cols-1) rotation = -Math.PI/2;
+
+                // add position to array in corresponding piece type
+                this.piecesRotation[[row, col]] = rotation;
             }
         }
     }
