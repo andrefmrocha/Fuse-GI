@@ -37,6 +37,7 @@ class MyGameOrchestrator extends CGFobject {
         this.moves = [];
         this.animations = [];
         this.movesPassed = 0;
+        this.scoreBoard = new ScoreBoard(30);
     }
 
     switchPlayers(player) {
@@ -87,6 +88,7 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     async getPlayerMoves() {
+        this.scoreBoard.startTimer(this.scene.currentTime);
         const response = await postRequest(this.userMoveURL, {
             board: this.boardState,
             player: this.currentPlayer == PLAYER_1 ? 0: 1
@@ -191,6 +193,11 @@ class MyGameOrchestrator extends CGFobject {
                 this.board.setBoardReady(true);
             }
         }
+
+        if(this.scoreBoard.update(time)){
+            this.getMoves();
+        }
+        
 
         this.animations.forEach(animation => animation.update(time));
     }
