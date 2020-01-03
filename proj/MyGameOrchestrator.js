@@ -42,6 +42,7 @@ class MyGameOrchestrator extends CGFobject {
     switchPlayers(player) {
         if(player){
             this.currentPlayer = player;
+            ScoreBoard.displayInfo(this.currentPlayer, this.playerPointsURL, this.boardState);
             return;
         }
 
@@ -321,7 +322,7 @@ class MyGameOrchestrator extends CGFobject {
         this.board.board = board;
         this.switchPlayers(
             this.moves.length != 0
-            && this.moves[this.moves.length - 1].player);
+            && this.moves[this.moves.length - 1].player == PLAYER_1 ? PLAYER_2 : PLAYER_1);
         this.getPlayerMoves();
     }
 
