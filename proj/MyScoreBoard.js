@@ -5,8 +5,9 @@ const time = document.querySelector('#time');
 const timeInput = time.querySelector('span');
 
 class ScoreBoard {
-    constructor(turnTime){
+    constructor(turnTime, orchestrator){
         this.turnTime = turnTime;
+        this.orchestrator = orchestrator;
     }
 
     static async displayInfo(player, url, board) {
@@ -33,6 +34,7 @@ class ScoreBoard {
         const timePassed = (currentTime - this.startTime) / 1000;
         if (timePassed > this.turnTime) {
             timeInput.textContent = "Time's up!";
+            this.orchestrator.possibleMoves =  this.orchestrator.possibleMoves.splice();
             return true;
         }
         timeInput.textContent = String(this.turnTime - timePassed).substr(0, 4);
