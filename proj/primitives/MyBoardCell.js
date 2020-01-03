@@ -42,17 +42,17 @@ class MyBoardCell extends CGFobject {
         const currentAmbient = this.scene.graph.selectedAmbient;
         switch(currentAmbient) {
             // space
-            case 0:
+            case 'Space':
                 this.mat.setTexture(this.space);
                 break;
 
             // zelda + up
-            case 1:
+            case 'Zelda':
                 this.mat.setTexture(this.tree_trunk);
                 break;
 
             // super mario
-            case 2:
+            case 'Mario World':
                 this.mat.setTexture(this.pipe_side);
                 break;
             
@@ -98,19 +98,19 @@ class MyBoardCell extends CGFobject {
 
         switch(currentAmbient) {
             // space
-            case 0:
+            case 'Space':
                 if (this.isInner) this.mat.setTexture(this.space_border);
                 else this.mat.setTexture(this.vortex);
                 break;
 
             // zelda + up
-            case 1:
+            case 'Zelda':
                 if (this.isInner) this.mat.setTexture(this.grass);
                 else this.mat.setTexture(this.tree_leaves);
                 break;
 
             // super mario
-            case 2:
+            case 'Mario World':
                 if (this.isInner) this.mat.setTexture(this.mario_brick);
                 else this.mat.setTexture(this.pipe_top);
                 break;

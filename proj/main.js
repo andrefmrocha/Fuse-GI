@@ -84,6 +84,30 @@ serialInclude([
   'MyAnimation.js',
 
   (main = function() {
+
+    const ambients = {
+      'Space': 'space.xml',
+      'Zelda': 'T6_G05.xml',
+      'Mario World': 'T6_G07.xml',
+      'Demo': 'demo.xml'
+    };
+
+    const scene = document.querySelector('#scenes');
+
+    Object.keys(ambients).forEach(key => {
+      const option = document.createElement('option');
+      option.textContent = key;
+
+      scene.appendChild(option);
+    });
+    scene.value = Object.keys(ambients)[0];
+    let selected = Object.keys(ambients)[0];
+
+    scene.addEventListener('change', () => {
+      selected = scene.value;
+    });
+
+    
  
     document.querySelectorAll('#menu > article').forEach((player) => addDropdown(player));
     document.querySelector('#menu > div > input').addEventListener('click', () => {
@@ -106,17 +130,17 @@ serialInclude([
         }
       });
 
-      if(!error){
-        document.querySelector('#menu').style.display = "none";
+      if(!error && selected){
+        document.querySelector('.wrapper').style.display = "none";
         document.querySelector('#panel').style.display = "block";
-        startGame(values[0], values[1]);
+        startGame(values[0], values[1], ambients, selected);
       }
     });
   })
 ]);
 
 
-function startGame(player1, player2){
+function startGame(player1, player2, ambients, selected){
   // Standard application, scene and interface setup
   
   var app = new CGFapplication(document.body);
@@ -124,13 +148,6 @@ function startGame(player1, player2){
   var myScene = new XMLscene(myInterface, player1, player2);
 
   app.init();
-
-  const ambients = [
-    'space.xml',
-    'T6_G05.xml',
-    'T6_G07.xml',
-    'demo.xml'
-  ];
   
   app.setScene(myScene);
   app.setInterface(myInterface);
@@ -138,13 +155,18 @@ function startGame(player1, player2){
 
     // create and load graph, and associate it to scene.
     // Check console for loading errors
-    var myGraph = new MySceneGraph(ambients, myScene);
+  var myGraph = new MySceneGraph(ambients, myScene, selected);
 
   app.run();
 }
 
 function addDropdown(player){
+
   player.querySelector('input[value="robot"]').addEventListener('change', () => {
     player.querySelector('select').style.display="block";
+  });
+
+  player.querySelector('input[value="human"]').addEventListener('change', () => {
+    player.querySelector('select').style.display="none";
   });
 }

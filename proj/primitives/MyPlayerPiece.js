@@ -61,7 +61,7 @@ class MyPlayerPiece extends CGFobject {
         const currentAmbient = this.scene.graph.selectedAmbient;
         switch(currentAmbient) {
             // space
-            case 0:
+            case 'Space':
                 if (this.color == "wt") { 
                     this.whiteMat.apply();
                     if (this.scene.orchestrator.piecesInBoard) this.scene.translate(0, 0.2, 0);
@@ -80,7 +80,7 @@ class MyPlayerPiece extends CGFobject {
                 break;
 
             // zelda + up
-            case 1:
+            case 'Zelda':
                 if (this.color == "wt") { 
                     this.whiteMat.apply();
                     this.scene.rotate(-Math.PI/2, 0, 1, 0);
@@ -97,7 +97,7 @@ class MyPlayerPiece extends CGFobject {
                 break;
 
             // super mario
-            case 2:
+            case 'Mario World':
                 this.scene.scale(0.005, 0.005, 0.005);
                 if (this.color == "wt") { 
                     this.whiteMat.apply();
