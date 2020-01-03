@@ -37,11 +37,11 @@ class MyGameOrchestrator extends CGFobject {
         this.moves = [];
         this.animations = [];
         this.movesPassed = 0;
-        this.scoreBoard = new ScoreBoard(30);
+        this.scoreBoard = new ScoreBoard(30, this);
     }
 
     switchPlayers(player) {
-        if(player){
+        if (player) {
             this.currentPlayer = player;
             ScoreBoard.displayInfo(this.currentPlayer, this.playerPointsURL, this.boardState);
             return;
@@ -63,15 +63,15 @@ class MyGameOrchestrator extends CGFobject {
 
 
     async getMoves() {
-        if(this.movesPassed == 2){
+        if (this.movesPassed == 2) {
             console.info('Game has finished!');
             this.playerMoves = undefined;
             const points = await ScoreBoard.displayInfo(this.currentPlayer, this.playerPointsURL, this.boardState);
 
-            if(points[PLAYER_1] == points[PLAYER_2]){
+            if (points[PLAYER_1] == points[PLAYER_2]) {
                 alert("It's a tie!")
             }
-            else if(points[PLAYER_1] > points[PLAYER_2]){
+            else if (points[PLAYER_1] > points[PLAYER_2]) {
                 alert('Player 1 has won!');
             } else {
                 alert('Player 2 has won!');
@@ -91,12 +91,12 @@ class MyGameOrchestrator extends CGFobject {
         this.scoreBoard.startTimer(this.scene.currentTime);
         const response = await postRequest(this.userMoveURL, {
             board: this.boardState,
-            player: this.currentPlayer == PLAYER_1 ? 0: 1
+            player: this.currentPlayer == PLAYER_1 ? 0 : 1
         });
 
         const moves = await response.json()
         this.playerMoves = moves.move;
-        if(moves.move.length == 0){
+        if (moves.move.length == 0) {
             this.movesPassed++;
             this.getMoves();
         } else {
@@ -112,7 +112,7 @@ class MyGameOrchestrator extends CGFobject {
             difficulty: this.playerInfo[this.currentPlayer].difficulty
         });
 
-        if(response.status == 204){
+        if (response.status == 204) {
             this.movesPassed++;
             this.getMoves();
             return;
@@ -194,10 +194,10 @@ class MyGameOrchestrator extends CGFobject {
             }
         }
 
-        if(this.scoreBoard.update(time)){
+        if (this.scoreBoard.update(time)) {
             this.getMoves();
         }
-        
+
 
         this.animations.forEach(animation => animation.update(time));
     }
@@ -308,21 +308,22 @@ class MyGameOrchestrator extends CGFobject {
         }
     }
 
-    isBotGame(){
-        return this.playerInfo[PLAYER_1].type == BOT 
-        &&  this.playerInfo[PLAYER_2].type == BOT;
+    isBotGame() {
+        return this.playerInfo[PLAYER_1].type == BOT
+            && this.playerInfo[PLAYER_2].type == BOT;
     }
 
     undo() {
         // only bots playing
         if (this.moves.length == 0 || this.isBotGame()) return;
-        
+
         // remove moves until the last player move
-        while(this.playerInfo[this.moves[this.moves.length - 1].player].type == BOT){
+        while (this.playerInfo[this.moves[this.moves.length - 1].player].type == BOT) {
 
             // check if there are only bot moves
-            const onlyBotMoves = this.moves.reduce((acc, curr) => acc && this.playerInfo[curr.player].type == BOT, true);
-            
+            const onlyBotMoves = this.moves.reduce((acc, curr) =>
+             acc && this.playerInfo[curr.player].type == BOT, true);
+
             // can not call undo if there are no player moves
             if (onlyBotMoves) return;
 
@@ -340,7 +341,7 @@ class MyGameOrchestrator extends CGFobject {
         this.board.board = board;
         this.switchPlayers(
             this.moves.length != 0
-            && this.moves[this.moves.length - 1].player == PLAYER_1 ? PLAYER_2 : PLAYER_1);
+                && this.moves[this.moves.length - 1].player == PLAYER_1 ? PLAYER_2 : PLAYER_1);
         this.getPlayerMoves();
     }
 
@@ -350,19 +351,19 @@ class MyGameOrchestrator extends CGFobject {
         const animation = new MyAnimation(
             (time) => {
                 const timeFactor = 1 - (finalTime - time) / (finalTime - initialTime);
-                if(timeFactor >= 1) return true;
-                const camera = []; 
-                
-                ['fov','near', 'far'].forEach((key) => {
+                if (timeFactor >= 1) return true;
+                const camera = [];
+
+                ['fov', 'near', 'far'].forEach((key) => {
                     const finalValue = finalCamera[key];
                     const initialValue = initialCamera[key];
                     camera.push(((finalValue - initialValue) * timeFactor) + initialValue);
                 });
-                
+
                 ['position', 'target'].forEach((key) => {
                     const finalValue = finalCamera[key];
                     const initialValue = initialCamera[key];
-                    camera.push(finalValue.map((value, index) => 
+                    camera.push(finalValue.map((value, index) =>
                         ((value - initialValue[index]) * timeFactor) + initialValue[index]));
                 });
 
@@ -378,7 +379,7 @@ class MyGameOrchestrator extends CGFobject {
         this.animations.push(animation);
     }
 
-    reset(){
+    reset() {
         document.querySelector('canvas').remove();
         document.querySelector('#menu').style.display = "flex";
         document.querySelector('#panel').style.display = "block";
