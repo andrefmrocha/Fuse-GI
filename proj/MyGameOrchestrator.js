@@ -4,7 +4,7 @@ const BOT = "robot";
 const PLAYER_2 = "bl";
 const START_DELAY_TIME = 5;
 const CAMERA_ANIMATION_TIME = 3;
-const MOVEMENT_ANIMATION_VELOCITY = 0.1;
+const MOVEMENT_ANIMATION_VELOCITY = 0.3;
 let animationID = 0;
 
 class MyGameOrchestrator extends CGFobject {
@@ -340,7 +340,7 @@ class MyGameOrchestrator extends CGFobject {
 
     undo() {
         // only bots playing
-        if (this.moves.length == 0 || this.isBotGame()) return;
+        if (this.gameEnded || this.moves.length == 0 || this.isBotGame()) return;
 
         console.log(this.moves);
 
