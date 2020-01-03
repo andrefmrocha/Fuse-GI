@@ -207,6 +207,10 @@ class XMLscene extends CGFscene {
 
   }
 
+  addReplayButton() {
+    this.interface.gui.add(this.gameOrchestrator, 'replayMoves').name('Replay Moves');
+  }
+
   addResetButton() {
     this.interface.gui.add(this.gameOrchestrator, 'reset').name('Restart Game');
   }

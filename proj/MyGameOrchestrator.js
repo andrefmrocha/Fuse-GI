@@ -80,7 +80,7 @@ class MyGameOrchestrator extends CGFobject {
             } else {
                 alert('Player 2 has won!');
             }
-            this.replayMoves();
+            this.scene.addReplayButton();
             this.scene.addResetButton();
             return;
         }
