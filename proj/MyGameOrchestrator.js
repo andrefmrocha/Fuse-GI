@@ -123,13 +123,8 @@ class MyGameOrchestrator extends CGFobject {
         this.movesPassed = 0;
 
         const movement = await response.json();
-        const move = [movement.xi, movement.yi, movement.xf, movement.yf];
-        this.moveBoard(move, this.boardState);
-        this.moves.push({ move, player: this.currentPlayer });
 
-        this.getMoves();
-
-        this.botMove = move;
+        this.botMove = [movement.xi, movement.yi, movement.xf, movement.yf];
     }
 
     async initGame() {
@@ -213,7 +208,7 @@ class MyGameOrchestrator extends CGFobject {
         if (this.botMove) {
             const move = this.botMove;
             this.moveBoard(move, this.boardState, true);
-            this.moves.push({ move, type: BOT });
+            this.moves.push({ move, player: this.currentPlayer });
             this.botMove = null;
         }
     }
