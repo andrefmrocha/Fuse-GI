@@ -37,7 +37,7 @@ class MyGameOrchestrator extends CGFobject {
         this.moves = [];
         this.animations = [];
         this.movesPassed = 0;
-        this.scoreBoard = new ScoreBoard(5, this);
+        this.scoreBoard = new ScoreBoard(30, this);
     }
 
     switchPlayers(player) {
