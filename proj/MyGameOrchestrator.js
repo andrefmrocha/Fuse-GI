@@ -4,7 +4,7 @@ const BOT = "robot";
 const PLAYER_2 = "bl";
 const START_DELAY_TIME = 5;
 const CAMERA_ANIMATION_TIME = 3;
-const MOVEMENT_ANIMATION_VELOCITY = 0.3;
+const MOVEMENT_ANIMATION_VELOCITY = 0.1;
 let animationID = 0;
 
 class MyGameOrchestrator extends CGFobject {
@@ -68,6 +68,8 @@ class MyGameOrchestrator extends CGFobject {
         if (this.movesPassed == 2) {
             console.info('Game has finished!');
             this.playerMoves = undefined;
+            this.movesPassed = 0;
+            this.gameEnded = true;
             const points = await ScoreBoard.displayInfo(this.currentPlayer, this.playerPointsURL, this.boardState);
 
             if (points[PLAYER_1] == points[PLAYER_2]) {
@@ -78,6 +80,7 @@ class MyGameOrchestrator extends CGFobject {
             } else {
                 alert('Player 2 has won!');
             }
+            this.replayMoves();
             this.scene.addResetButton();
             return;
         }
@@ -304,7 +307,7 @@ class MyGameOrchestrator extends CGFobject {
             });
         }
 
-        animate && this.animateMovement([move[1], move[0]], [move[3], move[2]], true);
+        animate && this.animateMovement([move[1], move[0]], [move[3], move[2]], true, 0);
         this.switchBoardPositions(board, move[0], move[1], move[2], move[3], "null");
     }
 
@@ -463,10 +466,25 @@ class MyGameOrchestrator extends CGFobject {
                     this.board.isAnimating = false;
 
                 // handle next move
-                if (changePlayer) this.getMoves();
+                if (!this.gameEnded && changePlayer) this.getMoves();
+
+                // moves replay
+                if (this.gameEnded && !this.board.isAnimating && this.nextMoveReplay != null && this.nextMoveReplay < this.moves.length) {
+                    this.moveBoard(this.moves[this.nextMoveReplay++].move, this.boardState, true);
+                }
             }
         );
         this.animations.push(animation);
+    }
+
+    replayMoves() {
+        const board = this.initialBoard.map(row => row.slice());
+        this.boardState = board;
+        this.board.board = board;
+        this.board.assignPiecesInitialRotation(board);
+        this.nextMoveReplay = 0;
+        if (this.moves.length) 
+            this.moveBoard(this.moves[this.nextMoveReplay++].move, this.boardState, true);
     }
 
 }
