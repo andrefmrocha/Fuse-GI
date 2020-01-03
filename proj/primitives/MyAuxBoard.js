@@ -1,5 +1,5 @@
 class MyAuxBoard extends CGFobject {
-    constructor(scene, nPieces, color, centerPos, piecesPositions, boardRotated) {
+    constructor(scene, gameboard, nPieces, color, centerPos, piecesPositions, boardRotated) {
         super(scene);
         this.nPieces = nPieces;
         this.cols = 2;
@@ -7,6 +7,8 @@ class MyAuxBoard extends CGFobject {
         this.boardRotated = boardRotated || false;
 
         this.centerPos = centerPos;
+
+        this.gameboard = gameboard;
     
         this.boardCell = new MyBoardCell(scene, false);
         this.playerPiece = new MyPlayerPiece(scene, color);
@@ -36,6 +38,7 @@ class MyAuxBoard extends CGFobject {
                 }
             };
         }
+        this.assignPiecesRotations();
     }
 
     startAnimationFinished() {
@@ -72,6 +75,25 @@ class MyAuxBoard extends CGFobject {
             }
         }
         return piecesPositions;
+    }
+
+    assignPiecesRotations() {
+        Object.keys(this.piecesTransformations).forEach( key => {
+
+            const transforms = this.piecesTransformations[key];
+            const end = transforms.end; 
+
+            /* Determine row and col to which this piece will jump to */
+            const rows = this.gameboard.board.length;
+            const cols = this.gameboard.board[0].length;
+            const start_z = -rows / 2 + 0.5;
+            const start_x = -cols / 2 + 0.5;
+            const end_row = end[2] - start_z;
+            const end_col = end[0] - start_x;
+
+            const end_rotation_y = this.gameboard.piecesRotation[[end_row, end_col]];
+            this.piecesTransformations[key].end_rotation_y = end_rotation_y || 0;            
+        });
     }
 
     update(time) {
@@ -124,6 +146,9 @@ class MyAuxBoard extends CGFobject {
 
                     // rotation around z axis
                     transforms.rotate.z = 2*Math.PI * time_factor * this.startAnimationRotations;
+
+                    // rotation around y axis
+                    transforms.rotate.y = transforms.end_rotation_y * time_factor * this.startAnimationRotations;
                 });
             }                
         }        
