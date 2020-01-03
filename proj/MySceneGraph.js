@@ -21,7 +21,7 @@ class MySceneGraph {
    * @constructor
    */
 
-  constructor(ambientsNames, scene) {
+  constructor(ambientsNames, scene, selected) {
     this.DEGREE_TO_RAD = Math.PI / 180;
     this.loadedOk = true;
 
@@ -42,9 +42,9 @@ class MySceneGraph {
     // Store the name of all valid ambients
     this.ambients = {};
     this.ambientsNames = ambientsNames;
-    this.selectedAmbient = 0;
-    this.newAmbient = 0;
-    this.ambientsNames.forEach((name, i) => this.ambients[i] = {});
+    this.selectedAmbient = selected;
+    this.newAmbient = selected;
+    Object.keys(this.ambientsNames).forEach((name) => this.ambients[name] = {});
 
     /*
      * Read the contents of the xml file, and refer to this class for loading and error handlers.
@@ -70,7 +70,7 @@ class MySceneGraph {
         anims[key].initialTime = 0; 
       });
   
-      this.selectedAmbient = parseInt(this.newAmbient);
+      this.selectedAmbient = this.newAmbient;
       this.scene.resetGUI();
       
       this.scene.views = this.ambients[this.selectedAmbient].perspectives;
@@ -120,7 +120,7 @@ class MySceneGraph {
       anims[key].initialTime = 0; 
     });
 
-    this.selectedAmbient = parseInt(this.newAmbient);
+    this.selectedAmbient = this.newAmbient;
 
     this.scene.onGraphLoaded();
   }
