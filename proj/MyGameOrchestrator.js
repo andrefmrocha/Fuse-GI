@@ -156,7 +156,6 @@ class MyGameOrchestrator extends CGFobject {
         this.gameReady = true;
         setTimeout(() => {
             this.delayEnded = true;
-            this.getMoves();
         }, START_DELAY_TIME * 1000);
     }
 
@@ -198,6 +197,7 @@ class MyGameOrchestrator extends CGFobject {
                 this.auxBoardBlack.setGameStarted(true);
                 this.auxBoardWhite.setGameStarted(true);
                 this.board.setBoardReady(true);
+                this.getMoves();
             }
         }
 
