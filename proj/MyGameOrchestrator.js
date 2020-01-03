@@ -4,7 +4,7 @@ const BOT = "robot";
 const PLAYER_2 = "bl";
 const START_DELAY_TIME = 5;
 const CAMERA_ANIMATION_TIME = 3;
-const MOVEMENT_ANIMATION_TIME = 1;
+const MOVEMENT_ANIMATION_VELOCITY = 0.3;
 let animationID = 0;
 
 class MyGameOrchestrator extends CGFobject {
@@ -246,7 +246,8 @@ class MyGameOrchestrator extends CGFobject {
 
             indexes.forEach((index, i) => {
                 const distance = reachingIndex + (indexes.length - i) * ((zMove > 0) ? 1 : -1);
-                animate && this.animateMovement([index, move[0]], [distance, move[0]], false);
+                const animation_delay = Math.abs(Math.abs(distance - index) - Math.abs(zMove)) * MOVEMENT_ANIMATION_VELOCITY * 1000;
+                animate && this.animateMovement([index, move[0]], [distance, move[0]], false, animation_delay);
                 this.switchBoardPositions(board, move[0], index, move[0], distance, "empty");
             });
 
@@ -257,9 +258,10 @@ class MyGameOrchestrator extends CGFobject {
             this.checkIntersections(indexes, (i) => row[i], xMove, row.length, reachingIndex);
             indexes.forEach((index, i) => {
                 const distance = reachingIndex + (indexes.length - i) * ((xMove > 0) ? 1 : -1);
-                animate && this.animateMovement([move[1], index], [move[1], distance], false);
+                const animation_delay = Math.abs(Math.abs(distance - index) - Math.abs(xMove)) * MOVEMENT_ANIMATION_VELOCITY * 1000;
+                animate && this.animateMovement([move[1], index], [move[1], distance], false, animation_delay);
                 this.switchBoardPositions(board, index, move[1], distance, move[1], "empty");
-            })
+            });
         }
        
         animate && this.animateMovement([move[1], move[0]], [move[3], move[2]], true);
@@ -338,14 +340,17 @@ class MyGameOrchestrator extends CGFobject {
         this.animations.push(animation);
     }
 
-    animateMovement(initialPos, endPos, changePlayer) {
-        const initialTime = this.scene.currentTime;
-        const finalTime = initialTime + 1000 * MOVEMENT_ANIMATION_TIME;
+    animateMovement(initialPos, endPos, changePlayer = false, startDelay = 0) {
+        // add delay to initial time
+        const initialTime = this.scene.currentTime + startDelay;
 
         const start_x = initialPos[1];
         const end_x = endPos[1];
         const start_z = initialPos[0];
         const end_z = endPos[0];
+
+        const travelDist = Math.max(Math.abs(end_x - start_x), Math.abs(end_z - start_z));
+        const finalTime = initialTime + 1000 * travelDist * MOVEMENT_ANIMATION_VELOCITY;
 
         // initial offset, to avoid visual delay until the next update
         this.board.animationsOffsets[[endPos[0], endPos[1]]] = {
@@ -361,6 +366,9 @@ class MyGameOrchestrator extends CGFobject {
 
                 const timeFactor = 1 - (finalTime - time) / (finalTime - initialTime);
                 if(timeFactor >= 1) return true;
+
+                // wait till animation starts
+                if(timeFactor < 0) return;
 
                 // animation is inverted, calculates from end to start position
                 const anim_x_offset = -(end_x - start_x) * (1-timeFactor);
