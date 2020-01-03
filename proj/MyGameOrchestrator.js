@@ -339,6 +339,8 @@ class MyGameOrchestrator extends CGFobject {
         // only bots playing
         if (this.moves.length == 0 || this.isBotGame()) return;
 
+        console.log(this.moves);
+
         // remove moves until the last player move
         while (this.playerInfo[this.moves[this.moves.length - 1].player].type == BOT) {
 
@@ -359,6 +361,7 @@ class MyGameOrchestrator extends CGFobject {
         // recalculate board, iterating over remaining moves
         const board = this.initialBoard.map(row => row.slice());
         this.boardState = board;
+        this.board.board = board;
         this.switchPlayers(
             this.moves.length != 0
                 && this.moves[this.moves.length - 1].player == PLAYER_1 ? PLAYER_2 : PLAYER_1);
@@ -394,6 +397,7 @@ class MyGameOrchestrator extends CGFobject {
             },
             () => {
                 this.animations.splice(this.animations.indexOf(animation), 1);
+                this.scene.changeViewActivity(false);
                 this.scene.sceneCamera = new CGFcamera(...Object.keys(finalCamera).map(key => finalCamera[key]));
             }
         );
@@ -402,7 +406,7 @@ class MyGameOrchestrator extends CGFobject {
 
     reset() {
         document.querySelector('canvas').remove();
-        document.querySelector('#menu').style.display = "flex";
+        document.querySelector('.wrapper').style.display = "flex";
         document.querySelector('#panel').style.display = "block";
         this.scene.interface.gui.destroy();
     }
