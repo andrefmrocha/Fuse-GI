@@ -300,9 +300,10 @@ class MyGameOrchestrator extends CGFobject {
         this.moves.splice(this.moves.length - 1, 1);
 
         const board = this.initialBoard.map(row => row.slice());
-        this.moves.forEach((move) => this.moveBoard(move.move, board, false));
         this.boardState = board;
         this.board.board = board;
+        this.board.assignPiecesInitialRotation(board);
+        this.moves.forEach((move) => this.moveBoard(move.move, board, false));
         this.switchPlayers();
         this.getPlayerMoves();
     }
