@@ -77,10 +77,17 @@ class XMLscene extends CGFscene {
       .onChange(this.graph.onSelectedAmbient.bind(this.graph));
   }
 
+  changeViewActivity(disabled) {
+    const view = document.querySelector('.cr.string .c > select')
+    view.disabled = disabled;
+  }
+
   onSelectedView() {
-    this.sceneCamera = this.views[this.currentView];
+    this.changeViewActivity(true);
+    this.gameOrchestrator.cameraChange(this.currentTime, this.sceneCamera, this.views[this.currentView]);
+    // this.sceneCamera = new CGFcamera(...Object.values(this.views[this.currentView]));
+    // this.interface.setActiveCamera(new CG);
     //this.secondaryCamera = this.views[this.securityView];
-    this.interface.setActiveCamera(this.sceneCamera);
   }
 
   /**
@@ -96,8 +103,8 @@ class XMLscene extends CGFscene {
    */
   initLights() {
     // Reads the lights from the scene graph.
-    this.lightsState = {};    
-    
+    this.lightsState = {};
+
     Object.keys(this.lights).forEach(key => this.lights[key].visible = false);
 
     const lights = this.graph.ambients[this.graph.selectedAmbient].lights;
@@ -136,9 +143,9 @@ class XMLscene extends CGFscene {
     this.addLightsToInterface();
   }
 
-  addLightsToInterface(){
+  addLightsToInterface() {
     this.lightsGUI = {};
-    Object.keys(this.lightsState).forEach((key,i) => {
+    Object.keys(this.lightsState).forEach((key, i) => {
       this.lightsGUI[i] = this.interface.gui.add(this.lightsState[key], 'isEnabled').name(key);
     });
   }
@@ -189,6 +196,7 @@ class XMLscene extends CGFscene {
   }
 
   update(currTime) {
+    this.currentTime = currTime;
     if (this.sceneInited) {
       const currentInstant = currTime - this.time;
       this.graph.updateComponentAnimations(currentInstant);
@@ -197,6 +205,10 @@ class XMLscene extends CGFscene {
 
     this.gameOrchestrator.update(currTime);
 
+  }
+
+  addResetButton() {
+    this.interface.gui.add(this.gameOrchestrator, 'reset').name('Restart Game');
   }
 
   checkKeys(eventCode) {
@@ -244,7 +256,7 @@ class XMLscene extends CGFscene {
 
   logPicking() {
     if (!this.pickMode && this.pickResults
-      && this.pickResults.length > 0 && this.gameOrchestrator.blMoves) {
+      && this.pickResults.length > 0 && this.gameOrchestrator.playerMoves) {
 
       this.gameOrchestrator.possibleMoves.splice(0, this.gameOrchestrator.possibleMoves.length);
       const validResults = this.pickResults.filter(result => result[0]);

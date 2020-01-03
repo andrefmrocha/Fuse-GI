@@ -7,6 +7,22 @@
             <from x="10" y="10" z="10" />
             <to x="0" y="0" z="0" />
         </perspective>
+        <perspective id="bottom" near="5" far="5000" angle="60">
+            <from x="0" y="10" z="10" />
+            <to x="0" y="0" z="0" />
+        </perspective>
+        <perspective id="top" near="5" far="5000" angle="60">
+            <from x="0" y="10" z="-10" />
+            <to x="0" y="0" z="0" />
+        </perspective>
+        <perspective id="right" near="5" far="5000" angle="60">
+            <from x="10" y="10" z="0" />
+            <to x="0" y="0" z="0" />
+        </perspective>
+        <perspective id="left" near="5" far="5000" angle="60">
+            <from x="-10" y="10" z="0" />
+            <to x="0" y="0" z="0" />
+        </perspective>
     </views>
 
     <globals>

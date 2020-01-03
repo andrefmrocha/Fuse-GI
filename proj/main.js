@@ -81,6 +81,7 @@ serialInclude([
   'MyScoreBoard.js',
   'cgfobjreader/CGFOBJModel.js',
   'cgfobjreader/CGFResourceReader.js',
+  'MyAnimation.js',
 
   (main = function() {
  
