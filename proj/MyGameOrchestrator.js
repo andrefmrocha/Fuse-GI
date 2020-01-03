@@ -307,8 +307,18 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     undo() {
+        // only bots playing
         if (this.moves.length == 0 || this.isBotGame()) return;
+        
+        // remove moves until the last player move
         while(this.playerInfo[this.moves[this.moves.length - 1].player].type == BOT){
+
+            // check if there are only bot moves
+            const onlyBotMoves = this.moves.reduce((acc, curr) => acc && this.playerInfo[curr.player].type == BOT, true);
+            
+            // can not call undo if there are no player moves
+            if (onlyBotMoves) return;
+
             this.moves.splice(this.moves.length - 1, 1);
         }
 
@@ -316,6 +326,7 @@ class MyGameOrchestrator extends CGFobject {
 
         this.moves.splice(this.moves.length - 1, 1);
 
+        // recalculate board, iterating over remaining moves
         const board = this.initialBoard.map(row => row.slice());
         this.moves.forEach((move) => this.moveBoard(move.move, board));
         this.boardState = board;
