@@ -76,7 +76,6 @@ serialInclude([
   'parser/AnimationsParser.js',
   'animation/Animation.js',
   'animation/KeyframeAnimation.js',
-  'MySecurityCamera.js',
   'MyGameOrchestrator.js',
   'MyScoreBoard.js',
   'cgfobjreader/CGFOBJModel.js',

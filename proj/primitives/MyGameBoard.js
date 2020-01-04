@@ -1,4 +1,9 @@
 class MyGameBoard extends CGFobject {
+    /**
+     * @method constructor
+     * @param  {object} scene - Reference to a MyScene object.
+     * @param  {string[][]} jsonBoard - Initial game board.
+     */
     constructor(scene, jsonBoard) {
         super(scene);
 
@@ -24,6 +29,7 @@ class MyGameBoard extends CGFobject {
     }
 
     display() {
+        // iterate through all board positions
         const start_z = -this.rows / 2 + 0.5;
         const start_x = -this.cols / 2 + 0.5;
         let i = 1;
@@ -38,7 +44,7 @@ class MyGameBoard extends CGFobject {
                 const translate_x = start_x + col;
 
                 this.scene.pushMatrix();
-                this.scene.translate(translate_x, 0, translate_z);
+                this.scene.translate(translate_x, 0, translate_z); // translate to current board position
 
                 // display board cell
                 this.scene.pushMatrix();
@@ -54,19 +60,21 @@ class MyGameBoard extends CGFobject {
 
                 // display disc if it exists
                 if (this.boardReady && boardCell != "empty" && boardCell != "null") {
-                    if (!this.isAnimating) {
+                    if (!this.isAnimating && !this.scene.gameOrchestrator.gameEnded) {
                         if (!this.isInside(row, col))
                             this.scene.gameOrchestrator.registerDisc(boardCell, col, row);
                         else {
                             this.scene.gameOrchestrator.discHasValidMove(col, row);
                         }
                     }
-
+                    
+                    // apply piece animation if it is being moved
                     const anim_offset = this.animationsOffsets[[row,col]];
                     if (anim_offset) {
                         this.scene.translate(anim_offset.x, anim_offset.y, anim_offset.z);
                     }
 
+                    // apply rotation based on the first position of the piece
                     const pieceRotation = this.piecesRotation[[row,col]];
                     if (pieceRotation) this.scene.rotate(pieceRotation, 0, 1, 0);
 
@@ -82,6 +90,10 @@ class MyGameBoard extends CGFobject {
         }
     }
 
+    /**
+     * Determine and store the initial rotation of the pieces for each position.
+     * @param  {string[][]} board - Initial game board.
+     */
     assignPiecesInitialRotation(board) {
         this.piecesRotation = {};
         const rows = board.length;
@@ -98,22 +110,6 @@ class MyGameBoard extends CGFobject {
                 this.piecesRotation[[row, col]] = rotation;
             }
         }
-    }
-
-    addPiece(row, col, piece) {
-        this.board[row][col] = piece;
-    }
-
-    removePiece(row, col) {
-        this.board[row][col] = "empty";
-    }
-
-    getPiece(row, col) {
-        return this.board[row][col];
-    }
-
-    movePiece(srow, scol, erow, ecol) {
-        return;
     }
 
     setBoardReady(ready) {

@@ -16,16 +16,17 @@ class MyGameOrchestrator extends CGFobject {
         this.playerInfo[PLAYER_1] = player1;
         this.playerInfo[PLAYER_2] = player2;
 
+        // endpoints to interact with Prolog server
         const serverURL = "http://localhost:8001";
         this.generateURL = serverURL + "/generate";
         this.userMoveURL = serverURL + "/move";
         this.botMoveURL = serverURL + "/bot";
         this.playerPointsURL = serverURL + "/points";
 
+        // auxiliar board positions
         this.auxBoardOffset = 7;
         this.whiteBoardPos = [this.auxBoardOffset, 0, 0];
         this.blackBoardPos = [-this.auxBoardOffset, 0, 0];
-
 
         this.board = new MyGameBoard(scene, [[]]);
         this.auxBoardWhite = new MyAuxBoard(scene, this.board, 0, "wt");
@@ -37,8 +38,8 @@ class MyGameOrchestrator extends CGFobject {
         this.movesPassed = 0;
         this.scoreBoard = new ScoreBoard(30, this);
 
-        this.gameReady = false;
-        this.piecesInBoard = false;
+        this.gameReady = false; // initGame finished
+        this.piecesInBoard = false; // initial animation finished
         this.initGame();
     }
 
@@ -66,12 +67,13 @@ class MyGameOrchestrator extends CGFobject {
 
     async getMoves() {
         if (this.movesPassed == 2) {
-            console.info('Game has finished!');
+            // game ended
             this.playerMoves = undefined;
             this.movesPassed = 0;
             this.gameEnded = true;
             const points = await ScoreBoard.displayInfo(this.currentPlayer, this.playerPointsURL, this.boardState);
 
+            // alert the user of the game result
             if (points[PLAYER_1] == points[PLAYER_2]) {
                 alert("It's a tie!")
             }
@@ -80,11 +82,14 @@ class MyGameOrchestrator extends CGFobject {
             } else {
                 alert('Player 2 has won!');
             }
+
+            // add buttons in GUI to replay moves and to restart game
             this.scene.addReplayButton();
             this.scene.addResetButton();
             return;
         }
 
+        // read next moves and store them
         this.switchPlayers();
         if (this.playerInfo[this.currentPlayer].type == HUMAN)
             this.getPlayerMoves();
@@ -93,7 +98,10 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     async getPlayerMoves() {
+        // player turn started
         this.scoreBoard.startTimer(this.scene.currentTime);
+
+        // ask server for valid moves
         const response = await postRequest(this.userMoveURL, {
             board: this.boardState,
             player: this.currentPlayer == PLAYER_1 ? 0 : 1
@@ -101,7 +109,9 @@ class MyGameOrchestrator extends CGFobject {
 
         const moves = await response.json()
         this.playerMoves = moves.move;
+
         if (moves.move.length == 0) {
+            // no valid moves
             this.movesPassed++;
             this.getMoves();
         } else {
@@ -111,6 +121,7 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     async getBotMove() {
+        // ask server for valid moves
         const response = await postRequest(this.botMoveURL, {
             board: this.boardState,
             player: this.currentPlayer == PLAYER_1 ? 0 : 1,
@@ -143,20 +154,30 @@ class MyGameOrchestrator extends CGFobject {
         this.initialBoard = this.boardState.map(row => row.slice());
         this.board = new MyGameBoard(this.scene, this.boardState);
 
+        // determine pieces absolute positions, for the initial animation
         const piecesPositions = this.determinePiecesInitialPositions(boardJson.board);
+
+        // auxiliar boards
         this.auxBoardWhite =
             new MyAuxBoard(this.scene, this.board, piecesPositions["wt"].length,
              "wt", this.whiteBoardPos, piecesPositions);
         this.auxBoardBlack =
             new MyAuxBoard(this.scene, this.board, piecesPositions["bl"].length,
              "bl", this.blackBoardPos, piecesPositions, true);
-
+        
         this.gameReady = true;
+
+        // set delay before initial animation starts
         setTimeout(() => {
             this.delayEnded = true;
         }, START_DELAY_TIME * 1000);
     }
 
+    /**
+     * Determines the absolute initial position of each piece in the board, 
+     * grouped by type: wt, bl, empty or corner.
+     * @param {string[][]} board
+     */
     determinePiecesInitialPositions(board) {
         let piecesPositions = {
             "wt": [],
@@ -186,10 +207,12 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     update(time) {
+        // initial animation
         if (this.delayEnded && !this.piecesInBoard) {
             this.auxBoardBlack.update(time);
             this.auxBoardWhite.update(time);
 
+            // animation finished
             if (this.auxBoardBlack.finishedStartAnimation && this.auxBoardWhite.finishedStartAnimation) {
                 this.piecesInBoard = true;
                 this.auxBoardBlack.setGameStarted(true);
@@ -203,11 +226,12 @@ class MyGameOrchestrator extends CGFobject {
             this.getMoves();
         }
 
-
+        // update pieces and cameras animations
         this.animations.forEach(animation => animation.update(time));
 
         if (!this.piecesInBoard) return;
 
+        // perform bot move if its the bot turn
         if (this.botMove) {
             const move = this.botMove;
             this.moveBoard(move, this.boardState, true);
@@ -217,19 +241,25 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     display() {
+        // initGame hasn't finished
         if (!this.gameReady) return;
 
+        // main game board
         this.board.display();
 
+        // player 1 auxiliar board
         this.scene.pushMatrix();
         this.scene.translate(...this.whiteBoardPos);
         this.auxBoardWhite.display();
         this.scene.popMatrix();
 
+        // player 2 auxiliar board
         this.scene.pushMatrix();
         this.scene.translate(...this.blackBoardPos);
         this.auxBoardBlack.display();
         this.scene.popMatrix();
+
+        // display valid moves of selected piece
         this.possibleMoves.forEach((move) => this.validCell.display(move));
     }
 
@@ -276,45 +306,67 @@ class MyGameOrchestrator extends CGFobject {
         }
     }
 
+    /**
+     * Performs a movement on the board, moving the necessary pieces.
+     * @param {number[]} move Move to be performed
+     * @param {string[][]} board Variable holding the board, to be updated
+     * @param {bool} animate Whether the movement should be animated or not
+     */
     moveBoard(move, board, animate) {
         const zMove = move[3] - move[1];
         const xMove = move[2] - move[0];
 
+        // only has movement on z axis
         if (xMove == 0) {
             const indexes = [];
             const reachingIndex = zMove + move[1];
             this.checkIntersections(indexes, (i) => board[i][move[0]], zMove, board.length, reachingIndex);
 
+            // for each piece which will be pushed
             indexes.forEach((index, i) => {
                 const distance = reachingIndex + (indexes.length - i) * ((zMove > 0) ? 1 : -1);
                 const animation_delay = Math.abs(Math.abs(distance - index) - Math.abs(zMove)) 
                                         * MOVEMENT_ANIMATION_VELOCITY * 1000;
+                
+                // animate movement if animate is set
                 animate && this.animateMovement([index, move[0]], [distance, move[0]], false, animation_delay);
+                
+                // update board to reflect positions change
                 this.switchBoardPositions(board, move[0], index, move[0], distance, "empty");
             });
-
+        
+        // movement on x axis
         } else {
             const indexes = [];
             const row = board[move[1]];
             const reachingIndex = xMove + move[0];
             this.checkIntersections(indexes, (i) => row[i], xMove, row.length, reachingIndex);
+            
+            // for each piece which will be pushed
             indexes.forEach((index, i) => {
                 const distance = reachingIndex + (indexes.length - i) * ((xMove > 0) ? 1 : -1);
                 const animation_delay = Math.abs(Math.abs(distance - index) - Math.abs(xMove)) 
                                         * MOVEMENT_ANIMATION_VELOCITY * 1000;
+                
+                // animate movement if animate is set
                 animate && this.animateMovement([move[1], index], [move[1], distance], false, animation_delay);
+                
+                // update board to reflect positions change
                 this.switchBoardPositions(board, index, move[1], distance, move[1], "empty");
             });
         }
 
+        // piece that was selected by the player
         animate && this.animateMovement([move[1], move[0]], [move[3], move[2]], true, 0);
         this.switchBoardPositions(board, move[0], move[1], move[2], move[3], "null");
     }
 
     switchBoardPositions(board, x1, y1, x2, y2, remainingVal) {
+        // update elements in the board
         board[y2][x2] = board[y1][x1];
         board[y1][x1] = remainingVal;
 
+        // update pieces rotation of the positions in the MyGameBoard
         this.board.piecesRotation[[y2, x2]] = this.board.piecesRotation[[y1, x1]];
         this.board.piecesRotation[[y1, x1]] = 0;
     }
@@ -338,11 +390,12 @@ class MyGameOrchestrator extends CGFobject {
             && this.playerInfo[PLAYER_2].type == BOT;
     }
 
+    /**
+     * Undo the previous player movement
+     */
     undo() {
         // only bots playing
         if (this.gameEnded || this.moves.length == 0 || this.isBotGame()) return;
-
-        console.log(this.moves);
 
         // remove moves until the last player move
         while (this.playerInfo[this.moves[this.moves.length - 1].player].type == BOT) {
@@ -361,15 +414,21 @@ class MyGameOrchestrator extends CGFobject {
 
         this.moves.splice(this.moves.length - 1, 1);
 
-        // recalculate board, iterating over remaining moves
+        // reset board
         const board = this.initialBoard.map(row => row.slice());
         this.boardState = board;
         this.board.board = board;
+
+        // switch player
         this.switchPlayers(
             this.moves.length != 0
                 && this.moves[this.moves.length - 1].player == PLAYER_1 ? PLAYER_2 : PLAYER_1);
+        
+        // replay moves
         this.board.assignPiecesInitialRotation(board);
         this.moves.forEach((move) => this.moveBoard(move.move, board, false));
+
+        // store valid moves of next player
         this.getPlayerMoves();
     }
 
@@ -411,6 +470,14 @@ class MyGameOrchestrator extends CGFobject {
         location.reload();
     }
 
+    /**
+     * Animate the movement of a player piece on the board.
+     * Assumes the piece is already at the end position and calculates an offset based on that.
+     * @param {number[]} move Starting position of the movement
+     * @param {number[]} endPos Ending position of the movement
+     * @param {bool} changePlayer Whether the player should change when animation ends
+     * @param {number} startDelay Time to wait before animation starts
+     */
     animateMovement(initialPos, endPos, changePlayer = false, startDelay = 0) {
         // add delay to initial time
         const initialTime = this.scene.currentTime + startDelay;
@@ -420,6 +487,7 @@ class MyGameOrchestrator extends CGFobject {
         const start_z = initialPos[0];
         const end_z = endPos[0];
 
+        // calculate time needed for animation
         const travelDist = Math.max(Math.abs(end_x - start_x), Math.abs(end_z - start_z));
         const finalTime = initialTime + 1000 * travelDist * MOVEMENT_ANIMATION_VELOCITY;
 
@@ -453,6 +521,7 @@ class MyGameOrchestrator extends CGFobject {
                 };
             },
             () => {
+                // remove current animation from animations
                 this.animations.splice(this.animations.indexOf(animation), 1);
 
                 // set offset to 0
@@ -465,7 +534,7 @@ class MyGameOrchestrator extends CGFobject {
                 // handle next move
                 if (!this.gameEnded && changePlayer) this.getMoves();
 
-                // moves replay
+                // replay the next move
                 if (this.gameEnded && !this.board.isAnimating && this.nextMoveReplay != null && this.nextMoveReplay < this.moves.length) {
                     this.moveBoard(this.moves[this.nextMoveReplay++].move, this.boardState, true);
                 }
@@ -474,18 +543,35 @@ class MyGameOrchestrator extends CGFobject {
         this.animations.push(animation);
     }
 
+    /**
+     * Replay the moves, iterating over them and animating.
+     * Only the first move is triggered but, since a replay variable is set, the
+     * animation knows, when it ends, it should trigger the next move
+     */
     replayMoves() {
+        // reset board
         const board = this.initialBoard.map(row => row.slice());
         this.boardState = board;
         this.board.board = board;
+
+        // reset pieces rotation
         this.board.assignPiecesInitialRotation(board);
+
+        // set variable to enable replay
         this.nextMoveReplay = 0;
+
+        // perform first move
         if (this.moves.length) 
             this.moveBoard(this.moves[this.nextMoveReplay++].move, this.boardState, true);
     }
 
 }
 
+/**
+ * Perform a post request to given URL with the given body.
+ * Should be used to fetch json information.
+ * @param {object} body Request body
+ */
 function postRequest(url, body) {
     return fetch(url, {
         method: 'POST',

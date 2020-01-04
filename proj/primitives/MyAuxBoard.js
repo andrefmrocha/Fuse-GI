@@ -1,11 +1,24 @@
 class MyAuxBoard extends CGFobject {
+    /**
+     * @method constructor
+     * @param  {object} scene - Reference to a MyScene object.
+     * @param  {object} gameboard - Reference to a MyGameBoard object.
+     * @param  {integer} nPieces - Number of pieces of the player.
+     * @param  {string} color - Color of the player. Should be "wt" or "bl".
+     * @param  {number[]} centerPos - Absolute position of this object's center.
+     * @param  {object} piecesPositions - Absolute position of the pieces on the MyGameBoard, after animation ends.
+     * @param  {bool} boardRotated - Whether this board is rotated 180 degrees along y axis.
+     */
     constructor(scene, gameboard, nPieces, color, centerPos, piecesPositions, boardRotated) {
         super(scene);
         this.nPieces = nPieces;
+
+        // has 2 columsn and variable number of rows, depending on number of pieces
         this.cols = 2;
         this.rows = Math.ceil(nPieces / this.cols);
         this.boardRotated = boardRotated || false;
 
+        // absolute position of board center
         this.centerPos = centerPos;
 
         this.gameboard = gameboard;
@@ -49,6 +62,9 @@ class MyAuxBoard extends CGFobject {
         this.gameStarted = val;
     }
 
+    /**
+     * Calculate the initial absolute positions of each piece.
+     */
     calculateInitialPiecesPositions() {
 
         let piecesPositions = [];
@@ -60,7 +76,7 @@ class MyAuxBoard extends CGFobject {
             const rotated_row = this.boardRotated ? this.rows - 1 - row : row;
             const translate_z = start_z + rotated_row;
             for (let col = 0; col < this.cols; col++) {
-
+    
                 const rotated_col = this.boardRotated ? col : this.cols - 1 - col;
                 const translate_x = start_x + rotated_col;
 
@@ -77,6 +93,10 @@ class MyAuxBoard extends CGFobject {
         return piecesPositions;
     }
 
+    /**
+     * Assign the rotation that each piece will have when placed on the board,
+     * for the initial animation.
+     */
     assignPiecesRotations() {
         Object.keys(this.piecesTransformations).forEach( key => {
 
@@ -91,7 +111,10 @@ class MyAuxBoard extends CGFobject {
             const end_row = end[2] - start_z;
             const end_col = end[0] - start_x;
 
+            // get rotation
             const end_rotation_y = this.gameboard.piecesRotation[[end_row, end_col]];
+
+            // store rotation in that piece transformation
             this.piecesTransformations[key].end_rotation_y = end_rotation_y || 0;            
         });
     }
@@ -174,9 +197,8 @@ class MyAuxBoard extends CGFobject {
                 this.boardCell.display();
                 this.scene.popMatrix();
 
-                // height of board surface
+                // only display pieces before game starts
                 if (!this.gameStarted && added_pieces < this.nPieces) {
-                    // console.log("Meias");
                     this.scene.pushMatrix();
 
                     // object animation transformations
@@ -185,6 +207,7 @@ class MyAuxBoard extends CGFobject {
                     const anim_rotate = this.piecesTransformations[added_pieces].rotate;
                     
                     this.scene.translate(...anim_translate);
+                    // height of board surface
                     this.scene.translate(translate_x, 0.5, translate_z);
 
                     this.scene.rotate(anim_rotate.z, 0, 0, 1);

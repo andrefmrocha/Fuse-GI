@@ -42,8 +42,8 @@ class MySceneGraph {
     // Store the name of all valid ambients
     this.ambients = {};
     this.ambientsNames = ambientsNames;
-    this.selectedAmbient = selected;
-    this.newAmbient = selected;
+    this.selectedAmbient = selected; // last selected ambient that is loaded
+    this.newAmbient = selected; // temporary variable to hold ambient when it is loading
     Object.keys(this.ambientsNames).forEach((name) => this.ambients[name] = {});
 
     /*
@@ -54,9 +54,12 @@ class MySceneGraph {
     parserUtils.reader.open('scenes/' + this.ambientsNames[this.selectedAmbient], this);
   }
 
-  /*
-    Change selected ambient and load it if needed
-  */
+  /**
+   * @method onSelectedAmbient
+   * Method called when the ambient is changed on the GUI.
+   * Updates the graph internal state according to the selected option.
+   * If selected ambient was already loaded, it detects it and does not load again.
+   */
   onSelectedAmbient() {
     // new ambient, load it
     if (Object.keys(this.ambients[this.newAmbient]).length == 0) {
@@ -247,7 +250,7 @@ class MySceneGraph {
       if ((error = componentParser.parseComponents(nodes[index], this)) != null) return error;
     }
 
-
+    // add option to select ambient to GUI
     this.scene.addAmbients();
     this.log('all parsed');
   }
@@ -519,6 +522,11 @@ class MySceneGraph {
     component.visited = false;
   }
 
+  /**
+   * @method updateComponentAnimations
+   * Updates the animations of the components in the graph
+   * @param  {number} currentInstant - Current time instant
+   */
   updateComponentAnimations(currentInstant){
     if(!this.loadedOk) return;
 

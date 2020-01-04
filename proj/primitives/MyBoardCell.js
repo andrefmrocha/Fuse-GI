@@ -1,4 +1,9 @@
 class MyBoardCell extends CGFobject {
+    /**
+     * @method constructor
+     * @param  {object} scene - Reference to a MyScene object.
+     * @param  {bool} isInner - Whether this cell is a inner position on the board.
+     */
     constructor(scene, isInner) {
         super(scene);
         this.isInner = isInner != null ? isInner : true;
@@ -40,6 +45,8 @@ class MyBoardCell extends CGFobject {
 
     display() {
         const currentAmbient = this.scene.graph.selectedAmbient;
+
+        // set texture depending on current ambient
         switch(currentAmbient) {
             // space
             case 'Space':
@@ -96,6 +103,7 @@ class MyBoardCell extends CGFobject {
         this.rectangle.display();
         this.scene.popMatrix();
 
+        // set texture depending on current ambient
         switch(currentAmbient) {
             // space
             case 'Space':

@@ -50,6 +50,9 @@ class XMLscene extends CGFscene {
     this.setPickEnabled(true);
   }
 
+  /**
+   * Resets the interface GUI.
+   */
   resetGUI() {
     if (!this.sceneInited) return;
 
@@ -197,14 +200,15 @@ class XMLscene extends CGFscene {
 
   update(currTime) {
     this.currentTime = currTime;
+
+    // update components' animations in graph
     if (this.sceneInited) {
       const currentInstant = currTime - this.time;
       this.graph.updateComponentAnimations(currentInstant);
     }
-    //this.securityCamera.update(currTime);
 
+    // update internal state of orchestrator
     this.gameOrchestrator.update(currTime);
-
   }
 
   addReplayButton() {
@@ -274,25 +278,10 @@ class XMLscene extends CGFscene {
 
   display() {
 
-    /*
-    this.securityCameraTexture.attachToFrameBuffer();
-    this.render(this.secondaryCamera);
-    this.securityCameraTexture.detachFromFrameBuffer();
-    */
-
     this.logPicking();
     this.clearPickRegistration();
     registerCounter = 1;
 
-
     this.render(this.sceneCamera);
-
-    /*
-    this.gl.disable(this.gl.DEPTH_TEST);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-    this.securityCamera.display(this.securityCameraTexture);    
-    this.gl.enable(this.gl.DEPTH_TEST);
-    */
   }
 }

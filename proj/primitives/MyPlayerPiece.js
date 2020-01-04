@@ -1,4 +1,9 @@
 class MyPlayerPiece extends CGFobject {
+    /**
+     * @method constructor
+     * @param  {object} scene - Reference to a MyScene object.
+     * @param  {string} color - Player color. Should be 'wt' or 'bl'.
+     */
     constructor(scene, color) {
         super(scene);
         
@@ -51,14 +56,15 @@ class MyPlayerPiece extends CGFobject {
         
     }
 
-    // TODO maybe pass rotation of object to display?
     display() {
+        // default material
         if (this.color == "wt") this.whiteTex.apply();
         else if (this.color == "bl") this.blackTex.apply();
 
         this.scene.pushMatrix();
 
         const currentAmbient = this.scene.graph.selectedAmbient;
+        // set texture depending on current ambient
         switch(currentAmbient) {
             // space
             case 'Space':

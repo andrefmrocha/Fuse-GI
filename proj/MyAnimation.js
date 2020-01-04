@@ -1,8 +1,10 @@
+  
+    class MyAnimation{
     /**
-     * @param  {Function} animation - must return true when it is finished
-     * @param  {Array} args
-     * @param  {Function} onFinished
-     */class MyAnimation{
+     * @param  {integer} ID ID of this animation, should be unique.
+     * @param  {Array} animation animation function, must return true when finished
+     * @param  {Function} onFinished callback to be called when animation finishes
+     */
     constructor(ID, animation, onFinished){
         this.ID = ID;
         this.animation = animation;
