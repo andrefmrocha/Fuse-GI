@@ -88,7 +88,7 @@ serialInclude([
       'Space': 'space.xml',
       'Zelda': 'T6_G05.xml',
       'Mario World': 'T6_G07.xml',
-      'Demo': 'demo.xml'
+      'Empty': 'demo.xml'
     };
 
     const scene = document.querySelector('#scenes');

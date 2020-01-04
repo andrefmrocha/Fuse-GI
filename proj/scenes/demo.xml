@@ -1,14 +1,10 @@
 <lxs>
     <scene root="demoRoot" axis_length="5"/>
 
-    <views default="testCamera">
+    <views default="defaultCamera">
         <perspective id="defaultCamera" near="5" far="500" angle="45">
-            <from x="6" y="6" z="6" />
+            <from x="10" y="10" z="10" />
             <to x="0" y="-2" z="0" />
-        </perspective>
-        <perspective id="testCamera" near="5" far="500" angle="30">
-            <from x="0" y="0" z="30" />
-            <to x="0" y="0" z="0" />
         </perspective>
     </views>
 
@@ -48,9 +44,7 @@
 
     <transformations>
         <transformation id="demoTransform">
-            <scale x="5" y="10" z="5" /><!--
-            <rotate axis="x" angle="-45" />
-            <rotate axis="z" angle="-45" />-->
+            <scale x="5" y="10" z="5" />
         </transformation>
     </transformations>
 
@@ -79,7 +73,7 @@
     
         <component id="demoRoot">
             <transformation>
-                <translate x="0" y="2" z="0" />
+                <translate x="0" y="1000" z="0" />
             </transformation>
             <materials>
                 <material id="demoMaterial2" />
