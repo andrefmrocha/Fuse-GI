@@ -87,6 +87,7 @@ class MyGameOrchestrator extends CGFobject {
             // add buttons in GUI to replay moves and to restart game
             this.scene.addReplayButton();
             this.scene.addResetButton();
+            this.scoreBoard.stopTimer();
             return;
         }
 
@@ -373,6 +374,7 @@ class MyGameOrchestrator extends CGFobject {
 
     registerMovement(move) {
         this.scene.registerForPick(registerCounter++, () => {
+            this.scoreBoard.stopTimer();
             this.moveBoard(move.move, this.boardState, true);
             this.moves.push({ ...move, player: this.currentPlayer });
         });

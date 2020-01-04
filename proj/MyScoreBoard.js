@@ -28,9 +28,12 @@ class ScoreBoard {
         this.startTime = currentTime;
         time.style.display = "block";
         timeInput.textContent = this.turnTime;
+        this.timerStopped = false;
     }
 
     update(currentTime) {
+        if(this.timerStopped) return;
+
         const timePassed = (currentTime - this.startTime) / 1000;
         if (timePassed > this.turnTime) {
             timeInput.textContent = "Time's up!";
@@ -38,5 +41,9 @@ class ScoreBoard {
             return true;
         }
         timeInput.textContent = String(this.turnTime - timePassed).substr(0, 4);
+    }
+
+    stopTimer() {
+        this.timerStopped = true;
     }
 }
