@@ -8,6 +8,13 @@ const MOVEMENT_ANIMATION_VELOCITY = 0.3;
 let animationID = 0;
 
 class MyGameOrchestrator extends CGFobject {
+    /**
+     * @method constructor
+     * @param  {object} scene - Reference to a MyScene object.
+     * @param  {object} player1 - Information such as type and difficulty of player 1.
+     * @param  {object} player2 - Information such as type and difficulty of player 2.
+     * @param  {object} gameInfo - Information about the game, such as dimensions and turn time.
+     */
     constructor(scene, player1, player2, gameInfo) {
         super(scene);
         scene.orchestrator = this;
@@ -44,6 +51,10 @@ class MyGameOrchestrator extends CGFobject {
         this.initGame();
     }
 
+    /**
+     * Switch the current player and update Scoreboard accordingly
+     * @param  {string} player - next player, should be "wt" or "bl".
+     */
     switchPlayers(player) {
         if (player) {
             this.currentPlayer = player;
@@ -404,6 +415,15 @@ class MyGameOrchestrator extends CGFobject {
         this.switchBoardPositions(board, move[0], move[1], move[2], move[3], "null");
     }
 
+    /**
+     * Perform the necessary changes in the board state when moving a piece.
+     * @param {string[][]} board Variable holding the board, to be updated
+     * @param {number} x1 X coordinate of initial position
+     * @param {number} y1 Y coordinate of initial position
+     * @param {number} x2 X coordinate of end position
+     * @param {number} y2 Y coordinate of end position
+     * @param {string} remainingVal Value that will be left on the initial position
+     */
     switchBoardPositions(board, x1, y1, x2, y2, remainingVal) {
         // update elements in the board
         board[y2][x2] = board[y1][x1];
