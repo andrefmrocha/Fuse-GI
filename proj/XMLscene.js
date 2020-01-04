@@ -66,6 +66,11 @@ class XMLscene extends CGFscene {
     this.lightsGUI = {};
   }
 
+  /**
+   * Adds a new view to the GUI interface
+   * @param  {Object} defaultCamera - current default Camera
+   * @param  {Object} previousView - previous selected view
+   */
   addViews(defaultCamera, previousView) {
 
     this.currentView = defaultCamera ? defaultCamera : Object.keys(this.views)[0];
@@ -78,19 +83,30 @@ class XMLscene extends CGFscene {
       .name('Scene View')
       .onChange(this.onSelectedView.bind(this));
   }
-
+  
+  /**
+   * Adds a new environment of the game to the GUI interface
+   */
   addAmbients() {
     this.ambientViewGUI = this.interface.gui
       .add(this.graph, 'newAmbient', Object.keys(this.graph.ambients))
       .name('Selected Ambient')
       .onChange(this.graph.onSelectedAmbient.bind(this.graph));
   }
-
+  
+  /**
+   * Changes the ability to control the selected camera for the game.
+   * Used to prevent the user from selecting a  new camera mid-animation.
+   * @param  {Boolean} disabled
+   */
   changeViewActivity(disabled) {
     const view = document.querySelector('.cr.string .c > select')
     view.disabled = disabled;
   }
-
+  /**
+   * Updates the current view based on the change that happens in
+   * GUI dropdown interfac
+   */
   onSelectedView() {
     this.changeViewActivity(true);
     this.gameOrchestrator.cameraChange(this.currentTime, this.sceneCamera, this.views[this.currentView]);
@@ -148,14 +164,19 @@ class XMLscene extends CGFscene {
 
     this.addLightsToInterface();
   }
-
+  /**
+   * Adds new lights to the interface
+   */
   addLightsToInterface() {
     this.lightsGUI = {};
     Object.keys(this.lightsState).forEach((key, i) => {
       this.lightsGUI[i] = this.interface.gui.add(this.lightsState[key], 'isEnabled').name(key);
     });
   }
-
+  /**
+   * Uses the information provided by the interface to update 
+   * the lights visual feedback
+   */
   updateLights() {
     Object.keys(this.lightsState).forEach(key => {
       const currentLightState = this.lightsState[key];
@@ -213,11 +234,17 @@ class XMLscene extends CGFscene {
     // update internal state of orchestrator
     this.gameOrchestrator.update(currTime);
   }
-
+  /**
+   * Adds a button that plays a replay of 
+   * all the past moves that have happened in the game
+   */
   addReplayButton() {
     this.interface.gui.add(this.gameOrchestrator, 'replayMoves').name('Replay Moves');
   }
 
+  /**
+   * Adds a button to restart the game
+   */
   addResetButton() {
     this.interface.gui.add(this.gameOrchestrator, 'reset').name('Restart Game');
   }
@@ -265,6 +292,11 @@ class XMLscene extends CGFscene {
     // ---- END Background, camera and axis setup
   }
 
+  /**
+   * Verifies picking information regarding the 
+   * previous iteration. According to this information,
+   * it will call their handlers
+   */
   logPicking() {
     if (!this.pickMode && this.pickResults
       && this.pickResults.length > 0 && this.gameOrchestrator.playerMoves) {

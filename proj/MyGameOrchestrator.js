@@ -65,7 +65,12 @@ class MyGameOrchestrator extends CGFobject {
         ScoreBoard.displayInfo(this.currentPlayer, this.playerPointsURL, this.boardState);
     }
 
-
+    /**
+     * Gets the moves for the next player to play
+     * It is also responsive to determining if the game 
+     * is to end, by using determing the number of times
+     * moves have been passed.
+     */
     async getMoves() {
         if (this.movesPassed == 2) {
             // game ended
@@ -99,6 +104,10 @@ class MyGameOrchestrator extends CGFobject {
             this.getBotMove();
     }
 
+    /**
+     * Determines all the possible moves the current player
+     * can do at the given board state.
+     */
     async getPlayerMoves() {
         // player turn started
         this.scoreBoard.startTimer(this.scene.currentTime);
@@ -122,6 +131,10 @@ class MyGameOrchestrator extends CGFobject {
 
     }
 
+    /**
+     * Gets a new move for the current bot player
+     * and executes it
+     */
     async getBotMove() {
         // ask server for valid moves
         const response = await postRequest(this.botMoveURL, {
@@ -143,6 +156,11 @@ class MyGameOrchestrator extends CGFobject {
         this.botMove = [movement.xi, movement.yi, movement.xf, movement.yf];
     }
 
+    /**
+     * Initializes all of the information pertaining the initialization
+     * of the game, such as getting a new board for the given size, as well
+     * as prepare the auxiliary boards.
+     */
     async initGame() {
         // sizes must be between 2 and 7, inclusive
         const request = {};
@@ -264,6 +282,14 @@ class MyGameOrchestrator extends CGFobject {
         this.possibleMoves.forEach((move) => this.validCell.display(move));
     }
 
+    /**
+     * Registers a Disc in the outer area of the board for picking.
+     * This action is made in order to prompt the user with all of 
+     * its possible moves.
+     * @param  {String} boardCell - must be "wt" or "bl"
+     * @param  {Number} col - column of the current cell
+     * @param  {Number} row - row of the current cell
+     */
     registerDisc(boardCell, col, row) {
         this.playerInfo[this.currentPlayer].type == HUMAN && this.currentPlayer == boardCell
             && this.scene.registerForPick(registerCounter++,
@@ -280,13 +306,29 @@ class MyGameOrchestrator extends CGFobject {
             );
     }
 
-
+    /**
+     * Determines if the current position i will 
+     * intersect the move the player is trying to make
+     * @param  {Number} i - Current position being asserted
+     * @param  {Number} reachingIndex - index the current move will reach
+     * @param  {Number} move - The planned move 
+     * @param  {String} cell - cell type, must be "wt" or "bl"
+     */
     intersects(i, reachingIndex, move, cell) {
         return (cell == "wt" || cell == "bl") &&
             ((move > 0 && i <= reachingIndex) ||
                 (move < 0 && i >= reachingIndex));
     }
 
+    /**
+     * Checks if the current move will
+     * intersect any of the other pieces already in play.
+     * @param  {Array} indexes - array to store the indexes that intersect the movement
+     * @param  {Function} getCell - function to get a cell based on an index
+     * @param  {Number} move - The planned move
+     * @param  {Number} length - Length of the board row or column
+     * @param  {Number} reachingIndex - index the current move will reach
+     */
     checkIntersections(indexes, getCell, move, length, reachingIndex) {
         if (move > 0) {
             for (let i = 1; i < length - 1; i++) {
@@ -372,6 +414,10 @@ class MyGameOrchestrator extends CGFobject {
         this.board.piecesRotation[[y1, x1]] = 0;
     }
 
+    /**
+     * Registers a Valid Move for being clicked by the user 
+     * @param  {Array} move - movement associated to the position
+     */
     registerMovement(move) {
         this.scene.registerForPick(registerCounter++, () => {
             this.scoreBoard.stopTimer();
@@ -380,6 +426,10 @@ class MyGameOrchestrator extends CGFobject {
         });
     }
 
+    /**
+     * @param  {Number} col - column of the current cell
+     * @param  {Number} row - row of the current cell
+     */
     discHasValidMove(col, row) {
         const discMove = this.possibleMoves.find((move) => move.move[2] == col && move.move[3] == row);
         if (discMove) {
@@ -387,6 +437,9 @@ class MyGameOrchestrator extends CGFobject {
         }
     }
 
+    /**
+     * Determines if a game is only composed of bots
+     */
     isBotGame() {
         return this.playerInfo[PLAYER_1].type == BOT
             && this.playerInfo[PLAYER_2].type == BOT;
@@ -434,6 +487,12 @@ class MyGameOrchestrator extends CGFobject {
         this.getPlayerMoves();
     }
 
+    /**
+     * Initiliazes a camer change animation
+     * @param  {Number} initialTime - time in milliseconds that the animation has begun
+     * @param  {Number} initialCamera - camera selected beforehand
+     * @param  {Number} finalCamera - newly selected camera
+     */
     cameraChange(initialTime, initialCamera, finalCamera) {
         const finalTime = initialTime + 1000 * CAMERA_ANIMATION_TIME;
 
@@ -467,7 +526,9 @@ class MyGameOrchestrator extends CGFobject {
         );
         this.animations.push(animation);
     }
-
+    /**
+     * Restarts the game.
+     */
     reset() {
         location.reload();
     }
