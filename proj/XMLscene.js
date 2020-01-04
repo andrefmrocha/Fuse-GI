@@ -66,16 +66,12 @@ class XMLscene extends CGFscene {
     this.lightsGUI = {};
   }
 
-  addViews(defaultCamera) {
-
-    // store previous view if it exists
-    const previousView = this.currentView;
+  addViews(defaultCamera, previousView) {
 
     this.currentView = defaultCamera ? defaultCamera : Object.keys(this.views)[0];
 
-    // if there was a previous view that still exists, keep it
-    if (previousView != null && this.views[previousView] != null)
-      this.currentView = previousView;
+    // if there is a previous view that still exists, maintain it
+    this.currentView = previousView && this.views[previousView] != null? previousView : this.currentView;
 
     this.currentViewGUI = this.interface.gui
       .add(this, 'currentView', Object.keys(this.views))

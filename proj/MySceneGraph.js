@@ -75,10 +75,16 @@ class MySceneGraph {
   
       this.selectedAmbient = this.newAmbient;
       this.scene.resetGUI();
+
+      // store previous view in the scene if it exists
+      const previousView = this.scene.currentView;
       
       this.scene.views = this.ambients[this.selectedAmbient].perspectives;
-      this.scene.addViews(this.ambients[this.selectedAmbient].defaultCamera);
-      this.scene.onSelectedView();
+      this.scene.addViews(this.ambients[this.selectedAmbient].defaultCamera, previousView);
+
+      // only change view if its a new one
+      if (previousView == null || this.scene.views[previousView] == null)
+        this.scene.onSelectedView();
 
       this.scene.addAmbients();
       this.scene.onGraphLoaded();
@@ -291,6 +297,9 @@ class MySceneGraph {
       return 'No perspectives found!';
     }
 
+    // store previous view in the scene if it exists
+    const previousView = this.scene.currentView;
+
     this.scene.views = perspectives;
 
     const defaultCamera = parserUtils.reader.getString(viewsNode, 'default');
@@ -298,8 +307,12 @@ class MySceneGraph {
 
     this.ambients[this.newAmbient].defaultCamera = defaultCamera;
 
-    this.scene.addViews(defaultCamera);
-    this.scene.onSelectedView();
+    this.scene.addViews(defaultCamera, previousView);        
+
+    // only change view if its a new one
+    if (previousView == null || this.scene.views[previousView] == null)
+      this.scene.onSelectedView();
+
     return null;
   }
 
