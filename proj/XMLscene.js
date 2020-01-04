@@ -9,12 +9,13 @@ class XMLscene extends CGFscene {
    * @constructor
    * @param {MyInterface} myinterface
    */
-  constructor(myinterface, player1, player2) {
+  constructor(myinterface, player1, player2, gameInfo) {
     super();
 
     this.interface = myinterface;
     this.player1 = player1;
     this.player2 = player2;
+    this.gameInfo = gameInfo;
   }
 
   /**
@@ -46,7 +47,7 @@ class XMLscene extends CGFscene {
 
     //this.securityCameraTexture = new CGFtextureRTT(this, this.gl.canvas.width, this.gl.canvas.height);
     //this.securityCamera = new MySecurityCamera(this);
-    this.gameOrchestrator = new MyGameOrchestrator(this, this.player1, this.player2);
+    this.gameOrchestrator = new MyGameOrchestrator(this, this.player1, this.player2, this.gameInfo);
     this.setPickEnabled(true);
   }
 
