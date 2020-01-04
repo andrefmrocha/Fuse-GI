@@ -106,6 +106,17 @@ serialInclude([
       selected = scene.value;
     });
 
+
+    const gui = new dat.GUI();
+    const gameInfo = {
+      'Board Rows': 5,
+      'Board Columns': 5,
+      'Move Time': 30
+    }
+
+    gui.add(gameInfo, 'Board Rows', 3, 7).step(1);
+    gui.add(gameInfo, 'Board Columns', 3, 7).step(1);
+    gui.add(gameInfo, 'Move Time', 10, 60);
     
  
     document.querySelectorAll('#menu > article').forEach((player) => addDropdown(player));
@@ -132,20 +143,20 @@ serialInclude([
       if(!error && selected){
         document.querySelector('.wrapper').style.display = "none";
         document.querySelector('#panel').style.display = "block";
-        startGame(values[0], values[1], ambients, selected);
-        console.log('Meiaaaaas');
+        gui.destroy();
+        startGame(values[0], values[1], ambients, selected, gameInfo);
       }
     });
   })
 ]);
 
 
-function startGame(player1, player2, ambients, selected){
+function startGame(player1, player2, ambients, selected, gameInfo){
   // Standard application, scene and interface setup
   
   const app = new CGFapplication(document.body);
   const myInterface = new MyInterface();
-  const myScene = new XMLscene(myInterface, player1, player2);
+  const myScene = new XMLscene(myInterface, player1, player2, gameInfo);
 
   app.init();
   

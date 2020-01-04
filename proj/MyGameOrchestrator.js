@@ -8,11 +8,12 @@ const MOVEMENT_ANIMATION_VELOCITY = 0.3;
 let animationID = 0;
 
 class MyGameOrchestrator extends CGFobject {
-    constructor(scene, player1, player2) {
+    constructor(scene, player1, player2, gameInfo) {
         super(scene);
         scene.orchestrator = this;
 
         this.playerInfo = {}
+        this.gameInfo = gameInfo;
         this.playerInfo[PLAYER_1] = player1;
         this.playerInfo[PLAYER_2] = player2;
 
@@ -36,7 +37,7 @@ class MyGameOrchestrator extends CGFobject {
         this.moves = [];
         this.animations = [];
         this.movesPassed = 0;
-        this.scoreBoard = new ScoreBoard(30, this);
+        this.scoreBoard = new ScoreBoard(gameInfo['Move Time'], this);
 
         this.gameReady = false; // initGame finished
         this.piecesInBoard = false; // initial animation finished
@@ -86,6 +87,7 @@ class MyGameOrchestrator extends CGFobject {
             // add buttons in GUI to replay moves and to restart game
             this.scene.addReplayButton();
             this.scene.addResetButton();
+            this.scoreBoard.stopTimer();
             return;
         }
 
@@ -143,10 +145,9 @@ class MyGameOrchestrator extends CGFobject {
 
     async initGame() {
         // sizes must be between 2 and 7, inclusive
-        const request = {
-            columns: 5,
-            rows: 5
-        };
+        const request = {};
+        request.rows = this.gameInfo['Board Rows'];
+        request.columns = this.gameInfo['Board Columns'];
 
         const genBoardResponse = await postRequest(this.generateURL, request);
         const boardJson = await genBoardResponse.json();
@@ -373,6 +374,7 @@ class MyGameOrchestrator extends CGFobject {
 
     registerMovement(move) {
         this.scene.registerForPick(registerCounter++, () => {
+            this.scoreBoard.stopTimer();
             this.moveBoard(move.move, this.boardState, true);
             this.moves.push({ ...move, player: this.currentPlayer });
         });

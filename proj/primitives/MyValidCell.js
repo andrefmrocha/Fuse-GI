@@ -21,9 +21,10 @@ class MyValidCell extends CGFobject {
 
     display(move) {
         this.scene.pushMatrix();
+        console.log(move);
         this.validMat.apply();
         this.scene.scale(1, 3, 1);
-        this.scene.translate(move.move[2] - Math.ceil(move.size_x / 2), 0.2, move.move[3] - Math.ceil(move.size_z / 2));
+        this.scene.translate(move.move[2] - ((move.size_x / 2) + 0.5), 0.2, move.move[3] - ((move.size_z / 2) + 0.5));
         this.scene.rotate(Math.PI / 2, 1, 0, 0);
         this.scene.gameOrchestrator.registerMovement(move);
         this.selection.display();
