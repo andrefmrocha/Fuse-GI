@@ -127,8 +127,14 @@ class XMLscene extends CGFscene {
     // Reads the lights from the scene graph.
     this.lightsState = {};
 
-    Object.keys(this.lights).forEach(key => this.lights[key].visible = false);
+    // disable all lights
+    Object.keys(this.lights).forEach(key => {
+      this.lights[key].setVisible(false);
+      this.lights[key].disable();
+      this.lights[key].update();
+    });
 
+    // enable defined lights in current ambient
     const lights = this.graph.ambients[this.graph.selectedAmbient].lights;
     Object.keys(lights).forEach((key, index) => {
       if (index < 8) { // Only eight lights allowed by WebGL.
