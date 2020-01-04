@@ -85,6 +85,7 @@ serialInclude([
   (main = function() {
 
     const ambients = {
+      'Classic': 'T6_G03.xml',
       'Space': 'space.xml',
       'Zelda': 'T6_G05.xml',
       'Mario World': 'T6_G07.xml',
