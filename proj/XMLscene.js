@@ -67,7 +67,16 @@ class XMLscene extends CGFscene {
   }
 
   addViews(defaultCamera) {
+
+    // store previous view if it exists
+    const previousView = this.currentView;
+
     this.currentView = defaultCamera ? defaultCamera : Object.keys(this.views)[0];
+
+    // if there was a previous view that still exists, keep it
+    if (previousView != null && this.views[previousView] != null)
+      this.currentView = previousView;
+
     this.currentViewGUI = this.interface.gui
       .add(this, 'currentView', Object.keys(this.views))
       .name('Scene View')
@@ -89,9 +98,6 @@ class XMLscene extends CGFscene {
   onSelectedView() {
     this.changeViewActivity(true);
     this.gameOrchestrator.cameraChange(this.currentTime, this.sceneCamera, this.views[this.currentView]);
-    // this.sceneCamera = new CGFcamera(...Object.values(this.views[this.currentView]));
-    // this.interface.setActiveCamera(new CG);
-    //this.secondaryCamera = this.views[this.securityView];
   }
 
   /**
