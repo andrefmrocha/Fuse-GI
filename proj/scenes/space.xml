@@ -23,6 +23,10 @@
             <from x="-10" y="10" z="0" />
             <to x="0" y="0" z="0" />
         </perspective>
+        <perspective id="above" near="5" far="5000" angle="60">
+            <from x="0.00001" y="10" z="0" />
+            <to x="0" y="0" z="0" />
+        </perspective>
     </views>
 
     <globals>
