@@ -75,7 +75,8 @@ count([], 0, _).
 count([Piece | T ], N, Piece) :- 
 	count(T, N1, Piece),
 	N is N1 + 1.
-count([_ | T ], N, Piece) :- 
+count([H | T ], N, Piece) :-
+	H \= Piece,
 	count(T, N, Piece).
 
 
@@ -87,10 +88,18 @@ initialize_board([Line | TBoard], FinalBoard):-
 	length([Line | TBoard], NRows),
 	length(Line, NColumns),
 	NPieces is (NColumns + NRows - 4) * 2,
-    generate_pieces([], Pieces, NPieces),
-	count(Pieces, N, bl),
-	count(Pieces, N, wt),
-	generate_board([Line | TBoard], FinalBoard, Pieces).
+	initialize_board([Line | TBoard], _, FinalBoard, NPieces, yes, no).
+    
+
+initialize_board(Board, _, FinalBoard, NPieces, WtCount, BlCount):-
+	WtCount \= BlCount,
+	generate_pieces([], NewPieces, NPieces),
+	count(NewPieces, NBlCount, bl),
+	count(NewPieces, NWtCount, wt),
+	initialize_board(Board, NewPieces, FinalBoard, NPieces, NWtCount, NBlCount).
+
+initialize_board(Board, Pieces, FinalBoard, _, Count, Count):-
+	generate_board(Board, FinalBoard, Pieces).
 
 %! generate_board(+EmptyBoard, -InitializedBoard, +PiecesList)
 % Applies the list of pieces (PiecesList) with a randomly generated around
