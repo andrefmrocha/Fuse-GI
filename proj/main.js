@@ -134,6 +134,7 @@ serialInclude([
         document.querySelector('.wrapper').style.display = "none";
         document.querySelector('#panel').style.display = "block";
         startGame(values[0], values[1], ambients, selected);
+        console.log('Meiaaaaas');
       }
     });
   })
@@ -143,9 +144,9 @@ serialInclude([
 function startGame(player1, player2, ambients, selected){
   // Standard application, scene and interface setup
   
-  var app = new CGFapplication(document.body);
-  var myInterface = new MyInterface();
-  var myScene = new XMLscene(myInterface, player1, player2);
+  const app = new CGFapplication(document.body);
+  const myInterface = new MyInterface();
+  const myScene = new XMLscene(myInterface, player1, player2);
 
   app.init();
   
@@ -153,9 +154,9 @@ function startGame(player1, player2, ambients, selected){
   app.setInterface(myInterface);
   myInterface.setActiveCamera(myScene.camera);
 
-    // create and load graph, and associate it to scene.
-    // Check console for loading errors
-  var myGraph = new MySceneGraph(ambients, myScene, selected);
+  // create and load graph, and associate it to scene.
+  // Check console for loading errors
+  const myGraph = new MySceneGraph(ambients, myScene, selected);
 
   app.run();
 }

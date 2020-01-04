@@ -405,10 +405,7 @@ class MyGameOrchestrator extends CGFobject {
     }
 
     reset() {
-        document.querySelector('canvas').remove();
-        document.querySelector('.wrapper').style.display = "flex";
-        document.querySelector('#panel').style.display = "block";
-        this.scene.interface.gui.destroy();
+        location.reload();
     }
 
     animateMovement(initialPos, endPos, changePlayer = false, startDelay = 0) {
